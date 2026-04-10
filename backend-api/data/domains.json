@@ -54,5 +54,12 @@
     "category": "gambling",
     "isBlocked": true,
     "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 9,
+    "domain": "yenibahis123.com",
+    "category": "unknown",
+    "isBlocked": true,
+    "createdAt": "2026-04-10T14:16:34.025Z"
   }
 ]

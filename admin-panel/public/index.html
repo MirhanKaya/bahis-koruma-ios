@@ -7,224 +7,382 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+
     header { background: #1a1a2e; color: white; padding: 16px 32px; display: flex; align-items: center; gap: 12px; }
     header h1 { font-size: 20px; font-weight: 600; }
     header .badge { background: #e63946; color: white; font-size: 11px; padding: 2px 8px; border-radius: 12px; font-weight: 600; }
+    .api-status { font-size: 12px; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 6px; margin-left: auto; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #666; display: inline-block; flex-shrink: 0; }
+    .dot.online  { background: #4caf50; }
+    .dot.offline { background: #e63946; }
+    .dot.checking { background: #ffc107; }
+
+    .toast-wrap { position: fixed; top: 20px; right: 20px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .toast { padding: 12px 18px; border-radius: 10px; font-size: 14px; font-weight: 500; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.2s ease; max-width: 320px; }
+    .toast.success { background: #2a9d8f; }
+    .toast.error   { background: #e63946; }
+    .toast.info    { background: #457b9d; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
     .container { max-width: 1100px; margin: 32px auto; padding: 0 24px; }
     .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
     .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
     .stat-card .label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
     .stat-card .value { font-size: 32px; font-weight: 700; color: #1a1a2e; }
     .stat-card .value.red { color: #e63946; }
+
     .panel { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 24px; }
-    .panel-header { padding: 16px 24px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; }
+    .panel-header { padding: 16px 24px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
     .panel-header h2 { font-size: 16px; font-weight: 600; }
     .add-form { display: flex; gap: 10px; }
-    .add-form input { flex: 1; border: 1px solid #ddd; border-radius: 8px; padding: 8px 14px; font-size: 14px; }
+    .add-form input { flex: 1; border: 1px solid #ddd; border-radius: 8px; padding: 8px 14px; font-size: 14px; min-width: 200px; }
     .add-form input:focus { outline: none; border-color: #1a1a2e; }
-    .btn { background: #1a1a2e; color: white; border: none; border-radius: 8px; padding: 8px 18px; font-size: 14px; cursor: pointer; font-weight: 500; transition: opacity 0.15s; }
-    .btn:hover { opacity: 0.85; }
-    .btn.danger { background: #e63946; }
+    .add-form input.error { border-color: #e63946; }
+
+    .btn { background: #1a1a2e; color: white; border: none; border-radius: 8px; padding: 8px 18px; font-size: 14px; cursor: pointer; font-weight: 500; transition: opacity 0.15s; white-space: nowrap; }
+    .btn:hover:not(:disabled) { opacity: 0.8; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn.danger    { background: #e63946; }
     .btn.secondary { background: #6c757d; }
+    .btn.sm { padding: 4px 12px; font-size: 12px; }
+
     table { width: 100%; border-collapse: collapse; }
     th { text-align: left; padding: 10px 24px; font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee; }
     td { padding: 12px 24px; font-size: 14px; border-bottom: 1px solid #f5f5f5; }
     tr:last-child td { border-bottom: none; }
-    .status { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
-    .status.blocked { background: #fde8ea; color: #e63946; }
-    .classify-result { padding: 16px 24px; }
-    .result-box { background: #f8f9fa; border-radius: 8px; padding: 16px; margin-top: 12px; font-size: 14px; display: none; }
-    .result-box.gambling { background: #fde8ea; border-left: 4px solid #e63946; }
-    .result-box.safe { background: #e8f5e9; border-left: 4px solid #4caf50; }
+    tr.removing td { opacity: 0.4; pointer-events: none; }
+
+    .pill { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .pill.blocked  { background: #fde8ea; color: #e63946; }
+    .pill.gambling { background: #fde8ea; color: #e63946; }
+    .pill.unknown  { background: #eee;    color: #666; }
+
     .empty { text-align: center; padding: 48px; color: #999; font-size: 14px; }
-    .api-status { font-size: 12px; color: #888; display: flex; align-items: center; gap: 6px; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; display: inline-block; }
-    .dot.online { background: #4caf50; }
-    .dot.offline { background: #e63946; }
+    .loading { text-align: center; padding: 40px; color: #bbb; font-size: 14px; }
+
+    .classify-body { padding: 20px 24px; }
+    .result-box { border-radius: 8px; padding: 16px; margin-top: 14px; font-size: 14px; line-height: 1.6; display: none; }
+    .result-box.gambling { background: #fde8ea; border-left: 4px solid #e63946; }
+    .result-box.safe     { background: #e8f5e9; border-left: 4px solid #4caf50; }
+    .result-box.loading-box { background: #f0f2f5; border-left: 4px solid #aaa; display: block; }
+
+    .error-banner { background: #fde8ea; border: 1px solid #f5c6cb; border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; color: #c0392b; display: none; }
+    .error-banner.show { display: block; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Bahis Koruma</h1>
-    <span class="badge">Admin Panel</span>
-    <span style="flex:1"></span>
-    <span class="api-status"><span class="dot" id="apiDot"></span><span id="apiStatus">Bağlanıyor...</span></span>
-  </header>
 
-  <div class="container">
-    <div class="stats">
-      <div class="stat-card">
-        <div class="label">Toplam Domain</div>
-        <div class="value" id="totalDomains">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">Engellenen</div>
-        <div class="value red" id="blockedDomains">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">Kategori</div>
-        <div class="value">Kumar</div>
-      </div>
+<header>
+  <h1>Bahis Koruma</h1>
+  <span class="badge">Admin Panel</span>
+  <span class="api-status">
+    <span class="dot checking" id="apiDot"></span>
+    <span id="apiStatus">Bağlanıyor...</span>
+  </span>
+</header>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<div class="container">
+
+  <div class="error-banner" id="errorBanner"></div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="label">Toplam Domain</div>
+      <div class="value" id="statTotal">—</div>
     </div>
-
-    <div class="panel">
-      <div class="panel-header">
-        <h2>Domain Listesi</h2>
-        <div class="add-form">
-          <input type="text" id="newDomain" placeholder="domain.com ekle..." />
-          <button class="btn" onclick="addDomain()">Ekle</button>
-        </div>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Domain</th>
-            <th>Kategori</th>
-            <th>Durum</th>
-            <th>Eklenme Tarihi</th>
-            <th>İşlem</th>
-          </tr>
-        </thead>
-        <tbody id="domainTable">
-          <tr><td colspan="5" class="empty">Yükleniyor...</td></tr>
-        </tbody>
-      </table>
+    <div class="stat-card">
+      <div class="label">Engellenen</div>
+      <div class="value red" id="statBlocked">—</div>
     </div>
-
-    <div class="panel">
-      <div class="panel-header">
-        <h2>AI Domain Sınıflandırma</h2>
-      </div>
-      <div class="classify-result">
-        <div class="add-form">
-          <input type="text" id="classifyDomain" placeholder="Kontrol edilecek domain..." />
-          <button class="btn secondary" onclick="classifyDomain()">Analiz Et</button>
-        </div>
-        <div class="result-box" id="classifyResult"></div>
-      </div>
+    <div class="stat-card">
+      <div class="label">Kategori</div>
+      <div class="value" id="statCategory">—</div>
     </div>
   </div>
 
-  <script>
-    const API = 'http://localhost:8000';
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Domain Listesi</h2>
+      <div class="add-form">
+        <input type="text" id="newDomain" placeholder="örn: yenibahis.com" autocomplete="off" />
+        <button class="btn" id="addBtn" onclick="addDomain()">Ekle</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Domain</th>
+          <th>Kategori</th>
+          <th>Durum</th>
+          <th>Eklenme Tarihi</th>
+          <th>İşlem</th>
+        </tr>
+      </thead>
+      <tbody id="domainTable">
+        <tr><td colspan="5" class="loading">Yükleniyor...</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-    async function checkApi() {
-      try {
-        const r = await fetch(`${API}/health`);
-        if (r.ok) {
-          document.getElementById('apiDot').className = 'dot online';
-          document.getElementById('apiStatus').textContent = 'API Bağlı';
-        }
-      } catch {
-        document.getElementById('apiDot').className = 'dot offline';
-        document.getElementById('apiStatus').textContent = 'API Bağlantı Yok';
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Alan Adı Sınıflandırma</h2>
+    </div>
+    <div class="classify-body">
+      <div class="add-form">
+        <input type="text" id="classifyInput" placeholder="Kontrol edilecek domain..." autocomplete="off" />
+        <button class="btn secondary" id="classifyBtn" onclick="classifyDomain()">Analiz Et</button>
+      </div>
+      <div class="result-box" id="classifyResult"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const API = 'http://127.0.0.1:8000';
+
+  // ── Toast ──────────────────────────────────────────────────
+  function toast(msg, type = 'info', duration = 3500) {
+    const wrap = document.getElementById('toastWrap');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(() => el.remove(), duration);
+  }
+
+  // ── Error banner ───────────────────────────────────────────
+  function showBanner(msg) {
+    const b = document.getElementById('errorBanner');
+    b.textContent = msg;
+    b.classList.add('show');
+  }
+  function hideBanner() {
+    document.getElementById('errorBanner').classList.remove('show');
+  }
+
+  // ── API health check ───────────────────────────────────────
+  async function checkApi() {
+    const dot = document.getElementById('apiDot');
+    const label = document.getElementById('apiStatus');
+    try {
+      const r = await fetch(`${API}/health`, { signal: AbortSignal.timeout(4000) });
+      if (r.ok) {
+        dot.className = 'dot online';
+        label.textContent = 'API Bağlı';
+        hideBanner();
+        return true;
       }
+    } catch {}
+    dot.className = 'dot offline';
+    label.textContent = 'API Bağlantı Yok';
+    showBanner('Backend API\'ye ulaşılamıyor (127.0.0.1:8000). Sunucunun çalıştığından emin olun.');
+    return false;
+  }
+
+  // ── Load & render domains ──────────────────────────────────
+  async function loadDomains() {
+    try {
+      const r = await fetch(`${API}/domains`, { signal: AbortSignal.timeout(6000) });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const json = await r.json();
+      if (!json.success) throw new Error(json.error || 'Bilinmeyen hata');
+      renderDomains(json.data);
+      updateStats(json.data);
+    } catch (err) {
+      document.getElementById('domainTable').innerHTML =
+        `<tr><td colspan="5" class="empty">Veriler yüklenemedi: ${err.message}</td></tr>`;
+      updateStats([]);
+    }
+  }
+
+  function renderDomains(list) {
+    const tbody = document.getElementById('domainTable');
+    if (!list || list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">Henüz domain eklenmedi</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(d => {
+      const date = d.createdAt ? new Date(d.createdAt).toLocaleDateString('tr-TR') : '—';
+      const catClass = d.category === 'gambling' ? 'gambling' : 'unknown';
+      const catLabel = d.category === 'gambling' ? 'Kumar' : 'Bilinmiyor';
+      return `
+        <tr id="row-${d.id}">
+          <td><strong>${escHtml(d.domain)}</strong></td>
+          <td><span class="pill ${catClass}">${catLabel}</span></td>
+          <td><span class="pill blocked">Engellendi</span></td>
+          <td>${date}</td>
+          <td>
+            <button class="btn danger sm" onclick="removeDomain(${d.id}, '${escHtml(d.domain)}')">Sil</button>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  function updateStats(list) {
+    const total   = list.length;
+    const blocked = list.filter(d => d.isBlocked).length;
+    const cats    = [...new Set(list.map(d => d.category))];
+    document.getElementById('statTotal').textContent   = total;
+    document.getElementById('statBlocked').textContent = blocked;
+    document.getElementById('statCategory').textContent = cats.length
+      ? cats.map(c => c === 'gambling' ? 'Kumar' : c).join(', ')
+      : '—';
+  }
+
+  // ── Add domain ─────────────────────────────────────────────
+  async function addDomain() {
+    const input = document.getElementById('newDomain');
+    const btn   = document.getElementById('addBtn');
+    const domain = input.value.trim();
+
+    input.classList.remove('error');
+
+    if (!domain) {
+      input.classList.add('error');
+      input.focus();
+      return;
     }
 
-    async function loadStats() {
-      try {
-        const r = await fetch(`${API}/api/stats`);
-        const data = await r.json();
-        if (data.success) {
-          document.getElementById('totalDomains').textContent = data.data.totalDomains;
-          document.getElementById('blockedDomains').textContent = data.data.blockedDomains;
-        }
-      } catch {}
-    }
+    btn.disabled = true;
+    btn.textContent = 'Ekleniyor...';
 
-    async function loadDomains() {
-      try {
-        const r = await fetch(`${API}/api/domains`);
-        const data = await r.json();
-        if (data.success) {
-          renderDomains(data.data);
-        }
-      } catch {
-        document.getElementById('domainTable').innerHTML = '<tr><td colspan="5" class="empty">API\'ye bağlanılamadı</td></tr>';
-      }
-    }
+    try {
+      const r = await fetch(`${API}/domains`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain }),
+        signal: AbortSignal.timeout(6000)
+      });
+      const json = await r.json();
 
-    function renderDomains(domains) {
-      const tbody = document.getElementById('domainTable');
-      if (domains.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty">Henüz domain eklenmedi</td></tr>';
+      if (r.status === 409) {
+        toast(`"${domain}" zaten listede mevcut.`, 'error');
+        input.classList.add('error');
         return;
       }
-      tbody.innerHTML = domains.map(d => `
-        <tr>
-          <td><strong>${d.domain}</strong></td>
-          <td>${d.category}</td>
-          <td><span class="status blocked">Engellendi</span></td>
-          <td>${new Date(d.addedAt).toLocaleDateString('tr-TR')}</td>
-          <td><button class="btn danger" onclick="removeDomain(${d.id})" style="padding:4px 12px;font-size:12px;">Sil</button></td>
-        </tr>
-      `).join('');
+      if (!json.success) throw new Error(json.error || 'Eklenemedi');
+
+      input.value = '';
+      toast(`"${json.data.domain}" başarıyla eklendi.`, 'success');
+      loadDomains();
+
+    } catch (err) {
+      toast(`Hata: ${err.message}`, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Ekle';
+    }
+  }
+
+  // ── Remove domain ──────────────────────────────────────────
+  async function removeDomain(id, domain) {
+    if (!confirm(`"${domain}" silinecek. Emin misiniz?`)) return;
+
+    const row = document.getElementById(`row-${id}`);
+    if (row) row.classList.add('removing');
+
+    try {
+      const r = await fetch(`${API}/domains/${id}`, {
+        method: 'DELETE',
+        signal: AbortSignal.timeout(6000)
+      });
+      const json = await r.json();
+      if (!json.success) throw new Error(json.error || 'Silinemedi');
+
+      toast(`"${domain}" silindi.`, 'success');
+      loadDomains();
+
+    } catch (err) {
+      if (row) row.classList.remove('removing');
+      toast(`Hata: ${err.message}`, 'error');
+    }
+  }
+
+  // ── Classify domain ────────────────────────────────────────
+  async function classifyDomain() {
+    const input = document.getElementById('classifyInput');
+    const btn   = document.getElementById('classifyBtn');
+    const box   = document.getElementById('classifyResult');
+    const domain = input.value.trim();
+
+    if (!domain) {
+      input.focus();
+      return;
     }
 
-    async function addDomain() {
-      const input = document.getElementById('newDomain');
-      const domain = input.value.trim();
-      if (!domain) return;
-      try {
-        const r = await fetch(`${API}/api/domains`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ domain })
-        });
-        const data = await r.json();
-        if (data.success) {
-          input.value = '';
-          loadDomains();
-          loadStats();
-        } else {
-          alert(data.error || 'Hata oluştu');
-        }
-      } catch { alert('API\'ye bağlanılamadı'); }
-    }
+    btn.disabled = true;
+    box.className = 'result-box loading-box';
+    box.style.display = 'block';
+    box.textContent = 'Analiz ediliyor...';
 
-    async function removeDomain(id) {
-      if (!confirm('Bu domaini silmek istediğinizden emin misiniz?')) return;
-      try {
-        await fetch(`${API}/api/domains/${id}`, { method: 'DELETE' });
-        loadDomains();
-        loadStats();
-      } catch { alert('Hata oluştu'); }
-    }
+    try {
+      const r = await fetch(`${API}/classify-domain`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain }),
+        signal: AbortSignal.timeout(6000)
+      });
+      const json = await r.json();
+      if (!json.success) throw new Error(json.error || 'Sınıflandırılamadı');
 
-    async function classifyDomain() {
-      const input = document.getElementById('classifyDomain');
-      const domain = input.value.trim();
-      if (!domain) return;
-      const box = document.getElementById('classifyResult');
-      box.style.display = 'block';
+      const isGambling = json.isBlocked;
+      const pct = Math.round((json.confidence || 0) * 100);
+      const keywords = json.matchedKeywords && json.matchedKeywords.length
+        ? `<br>Eşleşen kelimeler: <code>${json.matchedKeywords.join(', ')}</code>`
+        : '';
+
+      box.className = `result-box ${isGambling ? 'gambling' : 'safe'}`;
+      box.innerHTML = `
+        <strong>${escHtml(json.domain)}</strong><br>
+        Sonuç: ${isGambling ? '🚫 Kumar sitesi tespit edildi' : '✅ Güvenli görünüyor'}<br>
+        Kategori: ${json.category === 'gambling' ? 'Kumar' : 'Bilinmiyor'}<br>
+        Güven skoru: %${pct}
+        ${keywords}
+      `;
+    } catch (err) {
       box.className = 'result-box';
-      box.textContent = 'Analiz ediliyor...';
-      try {
-        const r = await fetch(`${API}/api/classify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ domain })
-        });
-        const data = await r.json();
-        if (data.success) {
-          box.className = `result-box ${data.isGambling ? 'gambling' : 'safe'}`;
-          box.innerHTML = `
-            <strong>${data.domain}</strong><br>
-            Sonuç: ${data.isGambling ? '🚫 Kumar sitesi tespit edildi' : '✅ Güvenli görünüyor'}<br>
-            Kategori: ${data.category}<br>
-            Güven: %${(data.confidence * 100).toFixed(0)}
-          `;
-        }
-      } catch { box.textContent = 'API\'ye bağlanılamadı'; }
+      box.style.display = 'block';
+      box.textContent = `Hata: ${err.message}`;
+    } finally {
+      btn.disabled = false;
     }
+  }
 
-    document.getElementById('newDomain').addEventListener('keydown', e => { if (e.key === 'Enter') addDomain(); });
-    document.getElementById('classifyDomain').addEventListener('keydown', e => { if (e.key === 'Enter') classifyDomain(); });
+  // ── Helpers ────────────────────────────────────────────────
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
 
-    checkApi();
-    loadStats();
-    loadDomains();
-    setInterval(() => { checkApi(); loadStats(); loadDomains(); }, 30000);
-  </script>
+  // ── Keyboard shortcuts ─────────────────────────────────────
+  document.getElementById('newDomain').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addDomain();
+  });
+  document.getElementById('classifyInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') classifyDomain();
+  });
+  document.getElementById('newDomain').addEventListener('input', () => {
+    document.getElementById('newDomain').classList.remove('error');
+  });
+
+  // ── Init ───────────────────────────────────────────────────
+  async function init() {
+    const ok = await checkApi();
+    await loadDomains();
+    setInterval(async () => {
+      await checkApi();
+      loadDomains();
+    }, 30000);
+  }
+
+  init();
+</script>
 </body>
 </html>
