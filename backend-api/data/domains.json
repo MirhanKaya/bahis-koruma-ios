@@ -61,5 +61,12 @@
     "category": "unknown",
     "isBlocked": true,
     "createdAt": "2026-04-10T14:16:34.025Z"
+  },
+  {
+    "id": 10,
+    "domain": "test-proxy.com",
+    "category": "unknown",
+    "isBlocked": true,
+    "createdAt": "2026-04-10T14:27:01.844Z"
   }
 ]

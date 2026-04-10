@@ -142,7 +142,7 @@
 </div>
 
 <script>
-  const API = 'http://127.0.0.1:8000';
+  const API = '';
 
   // ── Toast ──────────────────────────────────────────────────
   function toast(msg, type = 'info', duration = 3500) {
@@ -169,7 +169,7 @@
     const dot = document.getElementById('apiDot');
     const label = document.getElementById('apiStatus');
     try {
-      const r = await fetch(`${API}/health`, { signal: AbortSignal.timeout(4000) });
+      const r = await fetch(`${API}/api/health`, { signal: AbortSignal.timeout(4000) });
       if (r.ok) {
         dot.className = 'dot online';
         label.textContent = 'API Bağlı';
@@ -186,7 +186,7 @@
   // ── Load & render domains ──────────────────────────────────
   async function loadDomains() {
     try {
-      const r = await fetch(`${API}/domains`, { signal: AbortSignal.timeout(6000) });
+      const r = await fetch(`${API}/api/domains`, { signal: AbortSignal.timeout(6000) });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const json = await r.json();
       if (!json.success) throw new Error(json.error || 'Bilinmeyen hata');
@@ -251,7 +251,7 @@
     btn.textContent = 'Ekleniyor...';
 
     try {
-      const r = await fetch(`${API}/domains`, {
+      const r = await fetch(`${API}/api/domains`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain }),
@@ -286,7 +286,7 @@
     if (row) row.classList.add('removing');
 
     try {
-      const r = await fetch(`${API}/domains/${id}`, {
+      const r = await fetch(`${API}/api/domains/${id}`, {
         method: 'DELETE',
         signal: AbortSignal.timeout(6000)
       });
@@ -320,7 +320,7 @@
     box.textContent = 'Analiz ediliyor...';
 
     try {
-      const r = await fetch(`${API}/classify-domain`, {
+      const r = await fetch(`${API}/api/classify-domain`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain }),
