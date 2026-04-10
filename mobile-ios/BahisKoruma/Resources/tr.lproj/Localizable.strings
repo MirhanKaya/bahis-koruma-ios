@@ -1,0 +1,53 @@
+/* ============================================================
+   Bahis Koruma — Türkçe (tr)
+   ============================================================ */
+
+/* Uygulama */
+"app.name"                    = "Bahis Koruma";
+"app.tagline"                 = "Kumar Kalkanınız";
+
+/* Ana Ekran */
+"main.title"                  = "Bahis Koruma";
+"main.subtitle"               = "Kumar Kalkanınız";
+"main.description"            = "Kendinizi ve sevdiklerinizi kumar sitelerinden koruyun. Yapay zeka destekli alan adı tespiti sizi otomatik olarak güvende tutar.";
+
+/* Özellikler */
+"feature.ai.title"            = "Yapay Zeka Tespiti";
+"feature.ai.description"      = "Makine öğrenmesi ile bilinmeyen kumar sitelerini otomatik tespit eder";
+
+"feature.domains.title"       = "Alan Adı Engelleme";
+"feature.domains.description" = "Binlerce kumar sitesi engellendi ve her gün güncelleniyor";
+
+"feature.novpn.title"         = "VPN Gerektirmez";
+"feature.novpn.description"   = "Bağlantı hızınızı yavaşlatmadan çalışır";
+
+/* Butonlar */
+"button.get_started"          = "Başla";
+"button.learn_more"           = "Daha Fazla Bilgi";
+"button.continue"             = "Devam Et";
+"button.cancel"               = "İptal";
+"button.done"                 = "Tamam";
+"button.close"                = "Kapat";
+"button.back"                 = "Geri";
+
+/* Gezinme */
+"nav.home"                    = "Ana Sayfa";
+"nav.settings"                = "Ayarlar";
+"nav.about"                   = "Hakkında";
+
+/* Ayarlar Ekranı */
+"settings.title"              = "Ayarlar";
+"settings.language"           = "Dil";
+"settings.notifications"      = "Bildirimler";
+"settings.notifications.desc" = "Yeni kumar siteleri engellendiğinde bildirim al";
+"settings.version"            = "Sürüm";
+
+/* Hakkında Ekranı */
+"about.title"                 = "Hakkında";
+"about.description"           = "Bahis Koruma, VPN gerektirmeden kumar sitelerini tespit edip engellemek için yapay zeka kullanır.";
+"about.privacy"               = "Gizlilik Politikası";
+"about.terms"                 = "Kullanım Koşulları";
+
+/* Hatalar */
+"error.generic"               = "Bir şeyler ters gitti. Lütfen tekrar deneyin.";
+"error.network"               = "İnternet bağlantısı yok.";

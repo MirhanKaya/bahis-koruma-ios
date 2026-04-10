@@ -1,0 +1,53 @@
+/* ============================================================
+   Bahis Koruma — English (en)
+   ============================================================ */
+
+/* App */
+"app.name"                    = "Bahis Koruma";
+"app.tagline"                 = "Your Gambling Shield";
+
+/* Main Screen */
+"main.title"                  = "Bahis Koruma";
+"main.subtitle"               = "Your Gambling Shield";
+"main.description"            = "Protect yourself and your loved ones from gambling websites. AI-powered domain detection keeps you safe automatically.";
+
+/* Features */
+"feature.ai.title"            = "AI Detection";
+"feature.ai.description"      = "Automatically detects unknown gambling sites using machine learning";
+
+"feature.domains.title"       = "Domain Blocking";
+"feature.domains.description" = "Thousands of gambling sites blocked and updated daily";
+
+"feature.novpn.title"         = "No VPN Required";
+"feature.novpn.description"   = "Works without slowing down your connection speed";
+
+/* Buttons */
+"button.get_started"          = "Get Started";
+"button.learn_more"           = "Learn More";
+"button.continue"             = "Continue";
+"button.cancel"               = "Cancel";
+"button.done"                 = "Done";
+"button.close"                = "Close";
+"button.back"                 = "Back";
+
+/* Navigation */
+"nav.home"                    = "Home";
+"nav.settings"                = "Settings";
+"nav.about"                   = "About";
+
+/* Settings Screen */
+"settings.title"              = "Settings";
+"settings.language"           = "Language";
+"settings.notifications"      = "Notifications";
+"settings.notifications.desc" = "Get alerts when new gambling sites are blocked";
+"settings.version"            = "Version";
+
+/* About Screen */
+"about.title"                 = "About";
+"about.description"           = "Bahis Koruma uses AI to detect and block gambling websites without requiring a VPN.";
+"about.privacy"               = "Privacy Policy";
+"about.terms"                 = "Terms of Use";
+
+/* Errors */
+"error.generic"               = "Something went wrong. Please try again.";
+"error.network"               = "No internet connection.";
