@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "domain": "bahis.com",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "domain": "casino-tr.net",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "domain": "bet365.com",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 4,
+    "domain": "pokerstars.com",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 5,
+    "domain": "slotoyun.net",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 6,
+    "domain": "superbahis.com",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 7,
+    "domain": "jackpotcasino.io",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 8,
+    "domain": "kumarhane.net",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  }
+]
