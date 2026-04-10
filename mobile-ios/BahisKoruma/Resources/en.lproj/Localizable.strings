@@ -1,0 +1,21 @@
+/* App */
+"app.name" = "Bahis Koruma";
+
+/* Main Screen */
+"main.title" = "Bahis Koruma";
+"main.subtitle" = "Your Gambling Shield";
+"main.description" = "Protect yourself and your loved ones from gambling websites. AI-powered domain detection keeps you safe automatically.";
+
+/* Features */
+"feature.ai.title" = "AI Detection";
+"feature.ai.description" = "Automatically detects unknown gambling sites";
+
+"feature.domains.title" = "Domain Blocking";
+"feature.domains.description" = "Thousands of gambling sites blocked";
+
+"feature.novpn.title" = "No VPN Required";
+"feature.novpn.description" = "Works without slowing down your connection";
+
+/* Button */
+"button.get_started" = "Get Started";
+"button.learn_more" = "Learn More";

@@ -1,0 +1,21 @@
+/* App */
+"app.name" = "Bahis Koruma";
+
+/* Ana Ekran */
+"main.title" = "Bahis Koruma";
+"main.subtitle" = "Kumar Kalkanınız";
+"main.description" = "Kendinizi ve sevdiklerinizi kumar sitelerinden koruyun. Yapay zeka destekli alan adı tespiti sizi otomatik olarak güvende tutar.";
+
+/* Özellikler */
+"feature.ai.title" = "Yapay Zeka Tespiti";
+"feature.ai.description" = "Bilinmeyen kumar sitelerini otomatik tespit eder";
+
+"feature.domains.title" = "Alan Adı Engelleme";
+"feature.domains.description" = "Binlerce kumar sitesi engellendi";
+
+"feature.novpn.title" = "VPN Gerektirmez";
+"feature.novpn.description" = "Bağlantı hızınızı yavaşlatmadan çalışır";
+
+/* Buton */
+"button.get_started" = "Başla";
+"button.learn_more" = "Daha Fazla Bilgi";
