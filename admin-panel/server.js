@@ -21,7 +21,7 @@ function proxyRequest(req, res, backendPath, method, body) {
     port: 8000,
     path: url.pathname,
     method: method || req.method,
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json', 'x-api-key': 'bahis-koruma-admin-2026' }
   };
 
   const proxyReq = http.request(options, (proxyRes) => {
