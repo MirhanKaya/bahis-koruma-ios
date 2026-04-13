@@ -169,7 +169,7 @@
     const dot = document.getElementById('apiDot');
     const label = document.getElementById('apiStatus');
     try {
-      const r = await fetch(`${API}/api/health`, { signal: AbortSignal.timeout(4000) });
+      const r = await fetch(`${API}/api/health`, { headers: { 'Content-Type': 'application/json', 'x-api-key': 'test123' }, signal: AbortSignal.timeout(4000) });
       if (r.ok) {
         dot.className = 'dot online';
         label.textContent = 'API Bağlı';
@@ -186,7 +186,7 @@
   // ── Load & render domains ──────────────────────────────────
   async function loadDomains() {
     try {
-      const r = await fetch(`${API}/api/domains`, { signal: AbortSignal.timeout(6000) });
+      const r = await fetch(`${API}/api/domains`, { headers: { 'Content-Type': 'application/json', 'x-api-key': 'test123' }, signal: AbortSignal.timeout(6000) });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const json = await r.json();
       if (!json.success) throw new Error(json.error || 'Bilinmeyen hata');
@@ -253,7 +253,7 @@
     try {
       const r = await fetch(`${API}/api/domains`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': 'test123' },
         body: JSON.stringify({ domain }),
         signal: AbortSignal.timeout(6000)
       });
@@ -288,6 +288,7 @@
     try {
       const r = await fetch(`${API}/api/domains/${id}`, {
         method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': 'test123' },
         signal: AbortSignal.timeout(6000)
       });
       const json = await r.json();
@@ -322,7 +323,7 @@
     try {
       const r = await fetch(`${API}/api/classify-domain`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': 'test123' },
         body: JSON.stringify({ domain }),
         signal: AbortSignal.timeout(6000)
       });
