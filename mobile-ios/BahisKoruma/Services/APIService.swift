@@ -50,10 +50,10 @@ struct APIService {
 
     // =========================================================
     // ⚠️  API Base URL
-    // Replit proxy üzerinden /api path'i kullanılır.
-    // Admin panel ile aynı proxy yapısı (port 5000 → /api → 8000)
+    // Replit public dev URL — doğrudan backend port 8000'e bağlı.
+    // Endpoint'ler: baseURL + /register-api-user, baseURL + /domains
     // =========================================================
-    static let baseURL = "https://c64bcf14-e325-45be-ae48-931c995ce7ae-00-31lm6ujj0tq04.pike.replit.dev/api"
+    static let baseURL = "https://c64bcf14-e325-45be-ae48-931c995ce7ae-00-31lm6ujj0tq04.pike.replit.dev"
 
     // MARK: - POST /register-api-user
 
