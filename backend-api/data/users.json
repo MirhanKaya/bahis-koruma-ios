@@ -22,5 +22,13 @@
     "plan": "pro_6",
     "expiresAt": "2026-10-10T11:57:56.926Z",
     "createdAt": "2026-04-13T11:57:56.271Z"
+  },
+  {
+    "id": "a8d6e34c-c910-4557-8991-cf4550a4e776",
+    "email": "test@test.com",
+    "apiKey": "d7b24413c19597d318da4b7e1dfb48b5ab4885752eb49783",
+    "plan": "pro_6",
+    "expiresAt": "2026-10-10T12:08:47.806Z",
+    "createdAt": "2026-04-13T12:04:21.491Z"
   }
 ]

@@ -6,7 +6,7 @@
 "app.name"                    = "Bahis Koruma";
 "app.tagline"                 = "Your Gambling Shield";
 
-/* Main Screen */
+/* Main / Welcome Screen */
 "main.title"                  = "Bahis Koruma";
 "main.subtitle"               = "Your Gambling Shield";
 "main.description"            = "Protect yourself and your loved ones from gambling websites. AI-powered domain detection keeps you safe automatically.";
@@ -21,33 +21,45 @@
 "feature.novpn.title"         = "No VPN Required";
 "feature.novpn.description"   = "Works without slowing down your connection speed";
 
+/* Register Screen */
+"register.title"              = "Create Account";
+"register.email.label"        = "Email Address";
+"register.email.placeholder"  = "you@example.com";
+"register.button.continue"    = "Continue";
+"register.note"               = "You will receive a free 7-day trial. No credit card required.";
+"register.error.invalid_email" = "Please enter a valid email address.";
+
+/* Domain List Screen */
+"domains.title"               = "Blocked Domains";
+"domains.list.header"         = "All Domains";
+"domains.loading"             = "Loading domains...";
+"domains.empty"               = "No domains found.";
+"domains.error"               = "Could not load domains.";
+"domains.category.gambling"   = "Gambling";
+"domains.category.unknown"    = "Unknown";
+"domains.status.blocked"      = "Blocked";
+"domains.status.allowed"      = "Allowed";
+"domains.stats.total"         = "Total";
+"domains.stats.blocked"       = "Blocked";
+"domains.stats.gambling"      = "Gambling";
+
 /* Buttons */
 "button.get_started"          = "Get Started";
 "button.learn_more"           = "Learn More";
 "button.continue"             = "Continue";
 "button.cancel"               = "Cancel";
 "button.done"                 = "Done";
-"button.close"                = "Close";
+"button.close"                = "Sign Out";
 "button.back"                 = "Back";
+"button.retry"                = "Try Again";
 
 /* Navigation */
 "nav.home"                    = "Home";
 "nav.settings"                = "Settings";
 "nav.about"                   = "About";
 
-/* Settings Screen */
-"settings.title"              = "Settings";
-"settings.language"           = "Language";
-"settings.notifications"      = "Notifications";
-"settings.notifications.desc" = "Get alerts when new gambling sites are blocked";
-"settings.version"            = "Version";
-
-/* About Screen */
-"about.title"                 = "About";
-"about.description"           = "Bahis Koruma uses AI to detect and block gambling websites without requiring a VPN.";
-"about.privacy"               = "Privacy Policy";
-"about.terms"                 = "Terms of Use";
-
 /* Errors */
 "error.generic"               = "Something went wrong. Please try again.";
 "error.network"               = "No internet connection.";
+"error.unauthorized"          = "Invalid API key.";
+"error.subscription_expired"  = "Your subscription has expired.";
