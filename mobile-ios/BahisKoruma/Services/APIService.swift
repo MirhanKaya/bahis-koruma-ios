@@ -1,9 +1,10 @@
 import Foundation
 
-// MARK: - API Errors
+// MARK: - API Error
 
 enum APIError: LocalizedError {
     case invalidURL
+    case noResponse
     case requestFailed(Int)
     case decodingFailed
     case unauthorized
@@ -12,27 +13,50 @@ enum APIError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .invalidURL:              return L("error.network")
-        case .requestFailed(let c):    return "HTTP \(c)"
-        case .decodingFailed:          return L("error.generic")
-        case .unauthorized:            return L("error.unauthorized")
-        case .subscriptionExpired:     return L("error.subscription_expired")
-        case .serverError(let msg):    return msg
+        case .invalidURL:
+            return L("error.network")
+        case .noResponse:
+            return L("error.no_response")
+        case .requestFailed(let code):
+            return "\(L("error.request_failed")) (\(code))"
+        case .decodingFailed:
+            return L("error.generic")
+        case .unauthorized:
+            return L("error.unauthorized")
+        case .subscriptionExpired:
+            return L("error.subscription_expired")
+        case .serverError(let message):
+            return message
         }
     }
 }
 
 // MARK: - APIService
 
+/// Handles all network communication with the Bahis Koruma backend.
+///
+/// Registration flow:
+///   1. User enters email in RegisterView
+///   2. registerUser(email:) → POST /register-api-user
+///   3. Backend returns { success, data: { apiKey, plan, expiresAt, … } }
+///   4. apiKey is saved in UserDefaults via AppViewModel
+///
+/// Domain loading flow:
+///   1. fetchDomains(apiKey:) → GET /domains
+///   2. Request includes header "x-api-key: <apiKey>"
+///   3. Backend returns { success, data: [Domain] }
+///
 struct APIService {
 
-    // ⚠️ API Base URL
-    // Development : http://localhost:8000
-    // Replit      : replace with your Replit backend URL (port 8000)
-    // Example     : https://your-repl-name.replit.dev:8000
+    // =========================================================
+    // ⚠️  API Base URL — update before running on device
+    // =========================================================
+    // Local development : http://localhost:8000
+    // Replit backend    : https://<your-repl>.replit.dev:8000
+    // =========================================================
     static let baseURL = "http://localhost:8000"
 
-    // MARK: POST /register-api-user
+    // MARK: - POST /register-api-user
 
     static func registerUser(email: String) async throws -> UserResponse {
         guard let url = URL(string: "\(baseURL)/register-api-user") else {
@@ -48,20 +72,24 @@ struct APIService {
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let http = response as? HTTPURLResponse else {
-            throw APIError.requestFailed(0)
+            throw APIError.noResponse
         }
         guard (200...299).contains(http.statusCode) else {
             throw APIError.requestFailed(http.statusCode)
         }
 
-        let decoded = try JSONDecoder().decode(RegisterResponse.self, from: data)
-        guard decoded.success else {
-            throw APIError.serverError(decoded.error ?? L("error.generic"))
+        do {
+            let decoded = try JSONDecoder().decode(RegisterResponse.self, from: data)
+            guard decoded.success else {
+                throw APIError.serverError(decoded.error ?? L("error.generic"))
+            }
+            return decoded.data
+        } catch is DecodingError {
+            throw APIError.decodingFailed
         }
-        return decoded.data
     }
 
-    // MARK: GET /domains
+    // MARK: - GET /domains
 
     static func fetchDomains(apiKey: String) async throws -> [Domain] {
         guard let url = URL(string: "\(baseURL)/domains") else {
@@ -76,20 +104,28 @@ struct APIService {
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let http = response as? HTTPURLResponse else {
-            throw APIError.requestFailed(0)
+            throw APIError.noResponse
         }
 
         switch http.statusCode {
-        case 200...299: break
-        case 401: throw APIError.unauthorized
-        case 403: throw APIError.subscriptionExpired
-        default:  throw APIError.requestFailed(http.statusCode)
+        case 200...299:
+            break
+        case 401:
+            throw APIError.unauthorized
+        case 403:
+            throw APIError.subscriptionExpired
+        default:
+            throw APIError.requestFailed(http.statusCode)
         }
 
-        let decoded = try JSONDecoder().decode(DomainsResponse.self, from: data)
-        guard decoded.success else {
-            throw APIError.serverError(decoded.error ?? L("error.generic"))
+        do {
+            let decoded = try JSONDecoder().decode(DomainsResponse.self, from: data)
+            guard decoded.success else {
+                throw APIError.serverError(decoded.error ?? L("error.generic"))
+            }
+            return decoded.data
+        } catch is DecodingError {
+            throw APIError.decodingFailed
         }
-        return decoded.data
     }
 }

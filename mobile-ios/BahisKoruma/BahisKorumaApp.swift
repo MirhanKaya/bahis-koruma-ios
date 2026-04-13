@@ -18,16 +18,16 @@ struct AppFlowView: View {
     @EnvironmentObject var viewModel: AppViewModel
 
     var body: some View {
-        switch viewModel.screen {
-        case .welcome:
-            WelcomeView()
-                .transition(.opacity)
-        case .register:
-            RegisterView()
-                .transition(.move(edge: .trailing))
-        case .domains:
-            DomainListView()
-                .transition(.move(edge: .trailing))
+        Group {
+            switch viewModel.screen {
+            case .welcome:
+                WelcomeView()
+            case .register:
+                RegisterView()
+            case .domains:
+                DomainListView()
+            }
         }
+        .animation(.easeInOut(duration: 0.35), value: viewModel.screen)
     }
 }
