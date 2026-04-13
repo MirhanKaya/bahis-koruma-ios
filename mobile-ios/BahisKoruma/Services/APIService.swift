@@ -49,12 +49,11 @@ enum APIError: LocalizedError {
 struct APIService {
 
     // =========================================================
-    // ⚠️  API Base URL — update before running on device
+    // ⚠️  API Base URL
+    // Replit proxy üzerinden /api path'i kullanılır.
+    // Admin panel ile aynı proxy yapısı (port 5000 → /api → 8000)
     // =========================================================
-    // Local development : http://localhost:8000
-    // Replit backend    : https://<your-repl>.replit.dev:8000
-    // =========================================================
-    static let baseURL = "http://localhost:8000"
+    static let baseURL = "https://c64bcf14-e325-45be-ae48-931c995ce7ae-00-31lm6ujj0tq04.pike.replit.dev/api"
 
     // MARK: - POST /register-api-user
 
