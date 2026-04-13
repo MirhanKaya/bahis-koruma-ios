@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { readDomains, writeDomains, nextId } = require('../utils/storage');
+const { classifyDomain } = require('../utils/classifier');
 
 // GET /domains
-// Returns all domains
 router.get('/', (req, res) => {
   const domains = readDomains();
   res.json({
@@ -14,9 +14,10 @@ router.get('/', (req, res) => {
 });
 
 // POST /domains
-// Body: { domain, category? }
+// Body: { domain }
+// Auto-classifies the domain using the same keyword logic as /classify-domain
 router.post('/', (req, res) => {
-  const { domain, category = 'unknown' } = req.body;
+  const { domain } = req.body;
 
   if (!domain || typeof domain !== 'string' || domain.trim() === '') {
     return res.status(400).json({ success: false, error: 'domain is required' });
@@ -30,11 +31,13 @@ router.post('/', (req, res) => {
     return res.status(409).json({ success: false, error: 'Domain already exists' });
   }
 
+  const { category, isBlocked } = classifyDomain(clean);
+
   const newEntry = {
     id: nextId(domains),
     domain: clean,
     category,
-    isBlocked: true,
+    isBlocked,
     createdAt: new Date().toISOString()
   };
 

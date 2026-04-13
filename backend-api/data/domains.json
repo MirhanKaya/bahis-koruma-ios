@@ -68,5 +68,26 @@
     "category": "unknown",
     "isBlocked": true,
     "createdAt": "2026-04-10T14:27:01.844Z"
+  },
+  {
+    "id": 11,
+    "domain": "supercasino.net",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-04-13T11:44:31.557Z"
+  },
+  {
+    "id": 12,
+    "domain": "google.com",
+    "category": "unknown",
+    "isBlocked": false,
+    "createdAt": "2026-04-13T11:44:31.672Z"
+  },
+  {
+    "id": 13,
+    "domain": "yenibahis.io",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-04-13T11:44:31.806Z"
   }
 ]
