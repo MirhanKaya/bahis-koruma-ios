@@ -2,8 +2,9 @@ const express = require('express');
 const cors = require('cors');
 
 const { requireApiKey } = require('./middleware/auth');
-const domainsRouter   = require('./routes/domains');
-const classifyRouter  = require('./routes/classify');
+const domainsRouter  = require('./routes/domains');
+const classifyRouter = require('./routes/classify');
+const usersRouter    = require('./routes/users');
 
 const app = express();
 
@@ -11,7 +12,6 @@ app.use(cors());
 app.use(express.json());
 
 // ── Public ─────────────────────────────────────────────────────────────────────
-// /health is open — no API key required
 app.get('/health', (req, res) => {
   res.json({
     success: true,
@@ -21,16 +21,19 @@ app.get('/health', (req, res) => {
   });
 });
 
+// POST /register-api-user — open, creates a trial user
+// POST /admin/set-plan    — open, for testing purposes
+app.use('/', usersRouter);
+
 // ── Protected ──────────────────────────────────────────────────────────────────
-// All routes below require a valid x-api-key header
 app.use('/domains',         requireApiKey, domainsRouter);
 app.use('/classify-domain', requireApiKey, classifyRouter);
 
-// Legacy aliases (same protection)
+// Legacy aliases
 app.use('/api/domains',  requireApiKey, domainsRouter);
 app.use('/api/classify', requireApiKey, classifyRouter);
 
-// ── 404 fallback ───────────────────────────────────────────────────────────────
+// ── 404 ────────────────────────────────────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ success: false, error: `Route not found: ${req.method} ${req.path}` });
 });

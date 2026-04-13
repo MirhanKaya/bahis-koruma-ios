@@ -1,0 +1,26 @@
+[
+  {
+    "id": "system-001",
+    "email": "admin@bahiskoruma.app",
+    "apiKey": "bahis-koruma-admin-2026",
+    "plan": "pro_12",
+    "expiresAt": "2099-01-01T00:00:00.000Z",
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "system-002",
+    "email": "dev@bahiskoruma.app",
+    "apiKey": "test123",
+    "plan": "pro_12",
+    "expiresAt": "2099-01-01T00:00:00.000Z",
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "9aca5c6f-551d-4ea2-8fc8-edeb2e73ad58",
+    "email": "testuser@example.com",
+    "apiKey": "bb43320b33d4d2b25c3e83680a0d1d22bdcf1d48bcfcda48",
+    "plan": "pro_6",
+    "expiresAt": "2026-10-10T11:57:56.926Z",
+    "createdAt": "2026-04-13T11:57:56.271Z"
+  }
+]

@@ -56,13 +56,6 @@
     "createdAt": "2026-01-01T00:00:00.000Z"
   },
   {
-    "id": 9,
-    "domain": "yenibahis123.com",
-    "category": "unknown",
-    "isBlocked": true,
-    "createdAt": "2026-04-10T14:16:34.025Z"
-  },
-  {
     "id": 10,
     "domain": "test-proxy.com",
     "category": "unknown",
@@ -89,5 +82,19 @@
     "category": "gambling",
     "isBlocked": true,
     "createdAt": "2026-04-13T11:44:31.806Z"
+  },
+  {
+    "id": 14,
+    "domain": "yenitestbahis777.com",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-04-13T11:45:16.157Z"
+  },
+  {
+    "id": 15,
+    "domain": "yenibahis123.com",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-04-13T11:50:08.771Z"
   }
 ]
