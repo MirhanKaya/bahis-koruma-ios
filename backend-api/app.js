@@ -5,6 +5,7 @@ const { requireApiKey } = require('./middleware/auth');
 const domainsRouter  = require('./routes/domains');
 const classifyRouter = require('./routes/classify');
 const usersRouter    = require('./routes/users');
+const buddyRouter    = require('./routes/buddy');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/', usersRouter);
 // ── Protected ──────────────────────────────────────────────────────────────────
 app.use('/domains',         requireApiKey, domainsRouter);
 app.use('/classify-domain', requireApiKey, classifyRouter);
+app.use('/api/buddy/alert', requireApiKey, buddyRouter);
 
 // Legacy aliases
 app.use('/api/domains',  requireApiKey, domainsRouter);
