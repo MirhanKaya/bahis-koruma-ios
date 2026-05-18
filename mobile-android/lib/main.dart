@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'firebase_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Start Firestore listener early so domains are ready before the VPN screen mounts.
+  await FirebaseService.instance.start();
   runApp(const BahisKorumaApp());
 }
 
-// ── App Root ────────────────────────────────────────────────────────────────
+// ── App Root ─────────────────────────────────────────────────────────────────
 
 class BahisKorumaApp extends StatelessWidget {
   const BahisKorumaApp({super.key});
@@ -30,20 +34,10 @@ class BahisKorumaApp extends StatelessWidget {
 // ── MethodChannel Bridge ─────────────────────────────────────────────────────
 
 /// Dart-side bridge to the native [LocalVpnService] via MethodChannel.
-///
-/// Channel name: "com.bahiskoruma/vpn"
-/// Must match [MainActivity.CHANNEL] in Kotlin exactly.
-///
-/// Supported calls:
-///   startVPN({ blockedDomains: List<String> })  → bool
-///   stopVPN()                                   → bool
-///   isVPNRunning()                              → bool
-///   updateBlockedDomains({ domains: List<String> }) → bool
+/// Channel: "com.bahiskoruma/vpn" — must match MainActivity.CHANNEL in Kotlin.
 class VpnBridge {
   static const MethodChannel _channel = MethodChannel('com.bahiskoruma/vpn');
 
-  /// Sends ACTION_START to LocalVpnService.
-  /// [blockedDomains] is passed to the service; it replaces the default list.
   static Future<bool> startVPN({List<String> blockedDomains = const []}) async {
     try {
       final result = await _channel.invokeMethod<bool>(
@@ -56,19 +50,16 @@ class VpnBridge {
     }
   }
 
-  /// Sends ACTION_STOP to LocalVpnService.
   static Future<bool> stopVPN() async {
     final result = await _channel.invokeMethod<bool>('stopVPN');
     return result ?? false;
   }
 
-  /// Returns true if LocalVpnService is currently running.
   static Future<bool> isVPNRunning() async {
     final result = await _channel.invokeMethod<bool>('isVPNRunning');
     return result ?? false;
   }
 
-  /// Pushes a new domain blocklist to the running service without restarting.
   static Future<bool> updateBlockedDomains(List<String> domains) async {
     final result = await _channel.invokeMethod<bool>(
       'updateBlockedDomains',
@@ -78,7 +69,7 @@ class VpnBridge {
   }
 }
 
-// ── VPN Control Screen ───────────────────────────────────────────────────────
+// ── VPN Control Screen ────────────────────────────────────────────────────────
 
 class VpnControlScreen extends StatefulWidget {
   const VpnControlScreen({super.key});
@@ -93,23 +84,35 @@ class _VpnControlScreenState extends State<VpnControlScreen> {
   String _statusText = 'Durum kontrol ediliyor...';
   String? _errorText;
 
-  /// Default blocked-domain seed list.
-  /// At runtime this is replaced with the list fetched from the backend API.
-  static const List<String> _defaultDomains = [
-    'bet365.com', 'betboo.com', 'bwin.com', 'pokerstars.com',
-    'casino.com', 'williamhill.com', '1xbet.com', 'betway.com',
-    'bahigo.com', 'casinomaxi.com', 'bets10.com', 'betsson.com',
-  ];
+  /// Current blocked domain list — sourced from Firestore (or mock fallback).
+  List<String> _blockedDomains = [];
 
   @override
   void initState() {
     super.initState();
-    _refreshStatus();
+    _checkVpnStatus();
+
+    // Subscribe to Firestore domain stream.
+    // Whenever admin panel adds/removes a domain, this stream emits the new list.
+    // If VPN is running, the new list is pushed immediately to LocalVpnService.
+    FirebaseService.instance.domainsStream.listen(_onDomainsUpdated);
   }
 
-  // ── Status ──────────────────────────────────────────────────────────────
+  // ── Firestore domain stream callback ──────────────────────────────────
 
-  Future<void> _refreshStatus() async {
+  void _onDomainsUpdated(List<FirestoreDomain> domains) {
+    final blocked = FirebaseService.extractBlocked(domains);
+    setState(() => _blockedDomains = blocked);
+
+    // Push updated list to the running VPN service
+    if (_isRunning && blocked.isNotEmpty) {
+      VpnBridge.updateBlockedDomains(blocked).catchError((_) {});
+    }
+  }
+
+  // ── VPN Status ────────────────────────────────────────────────────────
+
+  Future<void> _checkVpnStatus() async {
     try {
       final running = await VpnBridge.isVPNRunning();
       _setRunning(running);
@@ -122,32 +125,32 @@ class _VpnControlScreenState extends State<VpnControlScreen> {
     setState(() {
       _isRunning  = running;
       _statusText = running
-          ? 'VPN Aktif — Kumar siteleri engelleniyor'
+          ? 'VPN Aktif — ${_blockedDomains.length} domain engelleniyor'
           : 'VPN Kapalı — Koruma devre dışı';
       _errorText  = null;
     });
   }
 
-  // ── Toggle ───────────────────────────────────────────────────────────────
+  // ── Toggle VPN ────────────────────────────────────────────────────────
 
   Future<void> _toggleVpn() async {
-    setState(() {
-      _isLoading = true;
-      _errorText = null;
-    });
+    setState(() { _isLoading = true; _errorText = null; });
 
     try {
       if (_isRunning) {
         final ok = await VpnBridge.stopVPN();
         _setRunning(!ok);
       } else {
-        final ok = await VpnBridge.startVPN(blockedDomains: _defaultDomains);
+        // Start VPN with Firestore-sourced blocked domains.
+        // Falls back to default list if Firestore hasn't loaded yet.
+        final domains = _blockedDomains.isNotEmpty
+            ? _blockedDomains
+            : _defaultDomains;
+        final ok = await VpnBridge.startVPN(blockedDomains: domains);
         _setRunning(ok);
       }
     } on PlatformException catch (e) {
-      setState(() {
-        _errorText = _friendlyError(e);
-      });
+      setState(() => _errorText = _friendlyError(e));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -160,7 +163,15 @@ class _VpnControlScreenState extends State<VpnControlScreen> {
     return 'Hata: ${e.message}';
   }
 
-  // ── UI ───────────────────────────────────────────────────────────────────
+  // ── Default domain list (used before Firestore responds) ───────────────
+
+  static const List<String> _defaultDomains = [
+    'bet365.com', 'betboo.com', 'bwin.com', 'pokerstars.com',
+    'casino.com', 'williamhill.com', '1xbet.com', 'betway.com',
+    'bahigo.com', 'casinomaxi.com', 'bets10.com', 'betsson.com',
+  ];
+
+  // ── UI ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -177,14 +188,14 @@ class _VpnControlScreenState extends State<VpnControlScreen> {
               _title,
               const SizedBox(height: 10),
               _statusLabel,
-              if (_errorText != null) ...[
-                const SizedBox(height: 12),
-                _errorBanner,
-              ],
+              _domainCountLabel,
+              if (_errorText != null) ...[const SizedBox(height: 12), _errorBanner],
               const SizedBox(height: 52),
               _toggleButton,
               const SizedBox(height: 20),
               _refreshButton,
+              const SizedBox(height: 10),
+              _firestoreStatus,
             ],
           ),
         ),
@@ -204,12 +215,7 @@ class _VpnControlScreenState extends State<VpnControlScreen> {
 
   Widget get _title => const Text(
         'Bahis Koruma',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.5,
-        ),
+        style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold),
       );
 
   Widget get _statusLabel => Text(
@@ -221,6 +227,21 @@ class _VpnControlScreenState extends State<VpnControlScreen> {
         ),
       );
 
+  Widget get _domainCountLabel => StreamBuilder<List<FirestoreDomain>>(
+        stream: FirebaseService.instance.domainsStream,
+        builder: (context, snap) {
+          if (!snap.hasData) return const SizedBox.shrink();
+          final count = snap.data!.where((d) => d.isBlocked).length;
+          return Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              '$count domain engel listesinde',
+              style: const TextStyle(color: Colors.white24, fontSize: 13),
+            ),
+          );
+        },
+      );
+
   Widget get _errorBanner => Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
@@ -228,21 +249,12 @@ class _VpnControlScreenState extends State<VpnControlScreen> {
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: const Color(0xFFe63946).withOpacity(0.4)),
         ),
-        child: Row(
-          children: [
-            const Icon(Icons.error_outline, color: Color(0xFFe63946), size: 18),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                _errorText!,
-                style: const TextStyle(
-                  color: Color(0xFFe63946),
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ],
-        ),
+        child: Row(children: [
+          const Icon(Icons.error_outline, color: Color(0xFFe63946), size: 18),
+          const SizedBox(width: 8),
+          Expanded(child: Text(_errorText!,
+              style: const TextStyle(color: Color(0xFFe63946), fontSize: 13))),
+        ]),
       );
 
   Widget get _toggleButton => SizedBox(
@@ -251,36 +263,49 @@ class _VpnControlScreenState extends State<VpnControlScreen> {
         child: ElevatedButton(
           onPressed: _isLoading ? null : _toggleVpn,
           style: ElevatedButton.styleFrom(
-            backgroundColor: _isRunning
-                ? const Color(0xFFe63946)
-                : const Color(0xFF2a9d8f),
+            backgroundColor: _isRunning ? const Color(0xFFe63946) : const Color(0xFF2a9d8f),
             foregroundColor: Colors.white,
             disabledBackgroundColor: Colors.white12,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             elevation: 0,
           ),
           child: _isLoading
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                      color: Colors.white, strokeWidth: 2.5),
-                )
+              ? const SizedBox(width: 22, height: 22,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
               : Text(
                   _isRunning ? "VPN'yi Durdur" : "VPN'yi Başlat",
-                  style: const TextStyle(
-                      fontSize: 17, fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                 ),
         ),
       );
 
   Widget get _refreshButton => TextButton(
-        onPressed: _isLoading ? null : _refreshStatus,
-        child: const Text(
-          'Durumu Yenile',
-          style: TextStyle(color: Colors.white38, fontSize: 14),
-        ),
+        onPressed: _isLoading ? null : _checkVpnStatus,
+        child: const Text('Durumu Yenile',
+            style: TextStyle(color: Colors.white38, fontSize: 14)),
+      );
+
+  Widget get _firestoreStatus => StreamBuilder<List<FirestoreDomain>>(
+        stream: FirebaseService.instance.domainsStream,
+        builder: (context, snap) {
+          final isLive = FirebaseService.instance.isConfigured;
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 6, height: 6,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isLive ? const Color(0xFF4caf50) : Colors.white24,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                isLive ? 'Firestore — Gerçek zamanlı' : 'Firestore — Mock veri',
+                style: const TextStyle(color: Colors.white24, fontSize: 12),
+              ),
+            ],
+          );
+        },
       );
 }

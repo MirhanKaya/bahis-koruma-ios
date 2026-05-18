@@ -9,6 +9,17 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # HTTP client — used for Firestore REST polling (no Firebase packages needed)
+  http: ^1.2.0
+
+  # ── Firebase (uncomment after adding google-services.json) ──────────────
+  # Step 1: Add google-services.json to android/app/
+  # Step 2: Uncomment the two lines below
+  # Step 3: Run: flutter pub get
+  # Step 4: Set _kUseNativeSdk = true in lib/firebase_service.dart
+  # firebase_core: ^2.24.0
+  # cloud_firestore: ^4.14.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
