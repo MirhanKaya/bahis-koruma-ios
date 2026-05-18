@@ -3,72 +3,128 @@
    ============================================================ */
 
 /* App */
-"app.name"                     = "Bahis Koruma";
-"app.tagline"                  = "Your Gambling Shield";
+"app.name"                      = "Bahis Koruma";
+"app.tagline"                   = "Your Gambling Shield";
 
 /* Main / Welcome Screen */
-"main.title"                   = "Bahis Koruma";
-"main.subtitle"                = "Your Gambling Shield";
-"main.description"             = "Protect yourself and your loved ones from gambling websites. AI-powered domain detection keeps you safe automatically.";
+"main.title"                    = "Bahis Koruma";
+"main.subtitle"                 = "Your Gambling Shield";
+"main.description"              = "Protect yourself and your loved ones from gambling websites. AI-powered domain detection keeps you safe automatically.";
 
 /* Features */
-"feature.ai.title"             = "AI Detection";
-"feature.ai.description"       = "Automatically detects unknown gambling sites using machine learning";
-
-"feature.domains.title"        = "Domain Blocking";
-"feature.domains.description"  = "Thousands of gambling sites blocked and updated daily";
-
-"feature.novpn.title"          = "No VPN Required";
-"feature.novpn.description"    = "Works without slowing down your connection speed";
+"feature.ai.title"              = "AI Detection";
+"feature.ai.description"        = "Automatically detects unknown gambling sites using machine learning";
+"feature.domains.title"         = "Domain Blocking";
+"feature.domains.description"   = "Thousands of gambling sites blocked and updated daily";
+"feature.novpn.title"           = "No VPN Required";
+"feature.novpn.description"     = "Works without slowing down your connection speed";
 
 /* Register Screen */
-"register.title"               = "Create Account";
-"register.subtitle"            = "Enter your email to get started";
-"register.email.label"         = "Email Address";
-"register.email.placeholder"   = "you@example.com";
-"register.button.continue"     = "Continue";
-"register.loading"             = "Creating account...";
-"register.note"                = "You will receive a free 7-day trial. No credit card required.";
-"register.error.invalid_email" = "Please enter a valid email address.";
+"register.title"                = "Create Account";
+"register.subtitle"             = "Enter your email to get started";
+"register.email.label"          = "Email Address";
+"register.email.placeholder"    = "you@example.com";
+"register.button.continue"      = "Continue";
+"register.loading"              = "Creating account...";
+"register.note"                 = "You will receive a free 7-day trial. No credit card required.";
+"register.error.invalid_email"  = "Please enter a valid email address.";
 
 /* Domain List Screen */
-"domains.title"                = "Blocked Domains";
-"domains.list.header"          = "All Domains";
-"domains.loading"              = "Loading domains...";
-"domains.empty"                = "No domains found.";
-"domains.error.title"          = "Could not load domains";
-"domains.category.gambling"    = "Gambling";
-"domains.category.unknown"     = "Unknown";
-"domains.status.blocked"       = "Blocked";
-"domains.status.allowed"       = "Allowed";
-"domains.stats.total"          = "Total";
-"domains.stats.blocked"        = "Blocked";
-"domains.stats.gambling"       = "Gambling";
+"domains.title"                 = "Blocked Domains";
+"domains.list.header"           = "All Domains";
+"domains.loading"               = "Loading domains...";
+"domains.empty"                 = "No domains found.";
+"domains.error.title"           = "Could not load domains";
+"domains.category.gambling"     = "Gambling";
+"domains.category.unknown"      = "Unknown";
+"domains.status.blocked"        = "Blocked";
+"domains.status.allowed"        = "Allowed";
+"domains.stats.total"           = "Total";
+"domains.stats.blocked"         = "Blocked";
+"domains.stats.gambling"        = "Gambling";
 
 /* Logout Confirmation */
-"domains.logout.title"         = "Sign Out";
-"domains.logout.message"       = "You will be signed out and returned to the welcome screen.";
-"domains.logout.confirm"       = "Sign Out";
+"domains.logout.title"          = "Sign Out";
+"domains.logout.message"        = "You will be signed out and returned to the welcome screen.";
+"domains.logout.confirm"        = "Sign Out";
 
-/* Buttons */
-"button.get_started"           = "Get Started";
-"button.learn_more"            = "Learn More";
-"button.continue"              = "Continue";
-"button.cancel"                = "Cancel";
-"button.done"                  = "Done";
-"button.signout"               = "Sign Out";
-"button.back"                  = "Back";
-"button.retry"                 = "Try Again";
+/* ============================================================
+   Subscription / Paywall
+   ============================================================ */
+
+/* Paywall Header */
+"sub.header.title"              = "Go Premium";
+"sub.header.subtitle"           = "Block all gambling sites. Protect yourself and your family 24/7.";
+
+/* Plan: Free Trial */
+"sub.plan.trial.title"          = "Free Trial";
+/* TODO: REVENUECAT — replace with Purchases.shared.offerings() price */
+"sub.plan.trial.price"          = "Free";
+"sub.plan.trial.duration"       = "7 days — no credit card needed";
+
+/* Plan: 6 Months */
+"sub.plan.pro6.title"           = "6 Months";
+/* TODO: REVENUECAT — replace with Purchases.shared.offerings() price */
+"sub.plan.pro6.price"           = "$4.99/mo";
+"sub.plan.pro6.duration"        = "Billed as $29.99 every 6 months";
+"sub.plan.pro6.badge"           = "POPULAR";
+
+/* Plan: 12 Months */
+"sub.plan.pro12.title"          = "12 Months";
+/* TODO: REVENUECAT — replace with Purchases.shared.offerings() price */
+"sub.plan.pro12.price"          = "$3.33/mo";
+"sub.plan.pro12.duration"       = "Billed as $39.99 per year · Save 33%";
+"sub.plan.pro12.badge"          = "BEST VALUE";
+
+/* CTA Buttons */
+"sub.cta.trial"                 = "Start Free Trial";
+"sub.cta.subscribe"             = "Subscribe Now";
+"sub.cta.loading"               = "Processing...";
+
+/* Toolbar */
+"sub.toolbar.upgrade"           = "Upgrade";
+
+/* Restore Purchases */
+"sub.restore.button"            = "Restore Purchases";
+"sub.restore.none_found"        = "No previous purchases found.";
+
+/* Footer */
+"sub.footer.cancel"             = "Cancel anytime. Subscription auto-renews unless cancelled at least 24 hours before the end of the period.";
+/* TODO: REVENUECAT — link real Terms and Privacy URLs in SubscriptionView.footerSection */
+"sub.footer.terms"              = "Terms of Use";
+"sub.footer.privacy"            = "Privacy Policy";
+
+/* Error Alert */
+"sub.error.title"               = "Purchase Failed";
+
+/* Expired Banner (shown in DomainListView when subscription lapses) */
+"sub.expired.banner.title"      = "Subscription Expired";
+"sub.expired.banner.message"    = "Your access has ended. Upgrade to keep blocking gambling sites.";
+"sub.expired.banner.cta"        = "Upgrade";
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+"button.get_started"            = "Get Started";
+"button.learn_more"             = "Learn More";
+"button.continue"               = "Continue";
+"button.cancel"                 = "Cancel";
+"button.done"                   = "Done";
+"button.signout"                = "Sign Out";
+"button.back"                   = "Back";
+"button.retry"                  = "Try Again";
 
 /* Navigation */
-"nav.home"                     = "Home";
-"nav.settings"                 = "Settings";
-"nav.about"                    = "About";
+"nav.home"                      = "Home";
+"nav.settings"                  = "Settings";
+"nav.about"                     = "About";
 
-/* Errors */
-"error.generic"                = "Something went wrong. Please try again.";
-"error.network"                = "No internet connection.";
-"error.no_response"            = "No response from server.";
-"error.request_failed"         = "Request failed";
-"error.unauthorized"           = "Invalid API key.";
-"error.subscription_expired"   = "Your subscription has expired.";
+/* ============================================================
+   Errors
+   ============================================================ */
+"error.generic"                 = "Something went wrong. Please try again.";
+"error.network"                 = "No internet connection.";
+"error.no_response"             = "No response from server.";
+"error.request_failed"          = "Request failed";
+"error.unauthorized"            = "Invalid API key.";
+"error.subscription_expired"    = "Your subscription has expired.";

@@ -3,72 +3,128 @@
    ============================================================ */
 
 /* Uygulama */
-"app.name"                     = "Bahis Koruma";
-"app.tagline"                  = "Kumar Kalkanınız";
+"app.name"                      = "Bahis Koruma";
+"app.tagline"                   = "Kumar Kalkanınız";
 
 /* Ana / Karşılama Ekranı */
-"main.title"                   = "Bahis Koruma";
-"main.subtitle"                = "Kumar Kalkanınız";
-"main.description"             = "Kendinizi ve sevdiklerinizi kumar sitelerinden koruyun. Yapay zeka destekli alan adı tespiti sizi otomatik olarak güvende tutar.";
+"main.title"                    = "Bahis Koruma";
+"main.subtitle"                 = "Kumar Kalkanınız";
+"main.description"              = "Kendinizi ve sevdiklerinizi kumar sitelerinden koruyun. Yapay zeka destekli alan adı tespiti sizi otomatik olarak güvende tutar.";
 
 /* Özellikler */
-"feature.ai.title"             = "Yapay Zeka Tespiti";
-"feature.ai.description"       = "Makine öğrenmesi ile bilinmeyen kumar sitelerini otomatik tespit eder";
-
-"feature.domains.title"        = "Alan Adı Engelleme";
-"feature.domains.description"  = "Binlerce kumar sitesi engellendi ve her gün güncelleniyor";
-
-"feature.novpn.title"          = "VPN Gerektirmez";
-"feature.novpn.description"    = "Bağlantı hızınızı yavaşlatmadan çalışır";
+"feature.ai.title"              = "Yapay Zeka Tespiti";
+"feature.ai.description"        = "Makine öğrenmesi ile bilinmeyen kumar sitelerini otomatik tespit eder";
+"feature.domains.title"         = "Alan Adı Engelleme";
+"feature.domains.description"   = "Binlerce kumar sitesi engellendi ve her gün güncelleniyor";
+"feature.novpn.title"           = "VPN Gerektirmez";
+"feature.novpn.description"     = "Bağlantı hızınızı yavaşlatmadan çalışır";
 
 /* Kayıt Ekranı */
-"register.title"               = "Hesap Oluştur";
-"register.subtitle"            = "Başlamak için e-posta adresinizi girin";
-"register.email.label"         = "E-posta Adresi";
-"register.email.placeholder"   = "siz@ornek.com";
-"register.button.continue"     = "Devam Et";
-"register.loading"             = "Hesap oluşturuluyor...";
-"register.note"                = "7 günlük ücretsiz deneme başlayacak. Kredi kartı gerekmez.";
-"register.error.invalid_email" = "Lütfen geçerli bir e-posta adresi girin.";
+"register.title"                = "Hesap Oluştur";
+"register.subtitle"             = "Başlamak için e-posta adresinizi girin";
+"register.email.label"          = "E-posta Adresi";
+"register.email.placeholder"    = "siz@ornek.com";
+"register.button.continue"      = "Devam Et";
+"register.loading"              = "Hesap oluşturuluyor...";
+"register.note"                 = "7 günlük ücretsiz deneme başlayacak. Kredi kartı gerekmez.";
+"register.error.invalid_email"  = "Lütfen geçerli bir e-posta adresi girin.";
 
 /* Domain Listesi Ekranı */
-"domains.title"                = "Engellenen Siteler";
-"domains.list.header"          = "Tüm Domainler";
-"domains.loading"              = "Domainler yükleniyor...";
-"domains.empty"                = "Henüz domain bulunamadı.";
-"domains.error.title"          = "Domainler yüklenemedi";
-"domains.category.gambling"    = "Kumar";
-"domains.category.unknown"     = "Bilinmiyor";
-"domains.status.blocked"       = "Engellendi";
-"domains.status.allowed"       = "İzin Verildi";
-"domains.stats.total"          = "Toplam";
-"domains.stats.blocked"        = "Engellenen";
-"domains.stats.gambling"       = "Kumar";
+"domains.title"                 = "Engellenen Siteler";
+"domains.list.header"           = "Tüm Domainler";
+"domains.loading"               = "Domainler yükleniyor...";
+"domains.empty"                 = "Henüz domain bulunamadı.";
+"domains.error.title"           = "Domainler yüklenemedi";
+"domains.category.gambling"     = "Kumar";
+"domains.category.unknown"      = "Bilinmiyor";
+"domains.status.blocked"        = "Engellendi";
+"domains.status.allowed"        = "İzin Verildi";
+"domains.stats.total"           = "Toplam";
+"domains.stats.blocked"         = "Engellenen";
+"domains.stats.gambling"        = "Kumar";
 
 /* Çıkış Onayı */
-"domains.logout.title"         = "Çıkış Yap";
-"domains.logout.message"       = "Hesabınızdan çıkılacak ve karşılama ekranına döneceksiniz.";
-"domains.logout.confirm"       = "Çıkış Yap";
+"domains.logout.title"          = "Çıkış Yap";
+"domains.logout.message"        = "Hesabınızdan çıkılacak ve karşılama ekranına döneceksiniz.";
+"domains.logout.confirm"        = "Çıkış Yap";
 
-/* Butonlar */
-"button.get_started"           = "Başla";
-"button.learn_more"            = "Daha Fazla Bilgi";
-"button.continue"              = "Devam Et";
-"button.cancel"                = "İptal";
-"button.done"                  = "Tamam";
-"button.signout"               = "Çıkış Yap";
-"button.back"                  = "Geri";
-"button.retry"                 = "Tekrar Dene";
+/* ============================================================
+   Abonelik / Ödeme Ekranı
+   ============================================================ */
+
+/* Paywall Başlık */
+"sub.header.title"              = "Premium'a Geç";
+"sub.header.subtitle"           = "Tüm kumar sitelerini engelle. Kendinizi ve ailenizi 7/24 koru.";
+
+/* Plan: Ücretsiz Deneme */
+"sub.plan.trial.title"          = "Ücretsiz Deneme";
+/* TODO: REVENUECAT — Purchases.shared.offerings() fiyatıyla değiştir */
+"sub.plan.trial.price"          = "Ücretsiz";
+"sub.plan.trial.duration"       = "7 gün — kredi kartı gerekmez";
+
+/* Plan: 6 Ay */
+"sub.plan.pro6.title"           = "6 Ay";
+/* TODO: REVENUECAT — Purchases.shared.offerings() fiyatıyla değiştir */
+"sub.plan.pro6.price"           = "₺49,99/ay";
+"sub.plan.pro6.duration"        = "Her 6 ayda bir ₺299,99 olarak faturalandırılır";
+"sub.plan.pro6.badge"           = "POPÜLER";
+
+/* Plan: 12 Ay */
+"sub.plan.pro12.title"          = "12 Ay";
+/* TODO: REVENUECAT — Purchases.shared.offerings() fiyatıyla değiştir */
+"sub.plan.pro12.price"          = "₺33,33/ay";
+"sub.plan.pro12.duration"       = "Yıllık ₺399,99 olarak faturalandırılır · %33 tasarruf";
+"sub.plan.pro12.badge"          = "EN İYİ DEĞER";
+
+/* CTA Butonları */
+"sub.cta.trial"                 = "Ücretsiz Denemeyi Başlat";
+"sub.cta.subscribe"             = "Şimdi Abone Ol";
+"sub.cta.loading"               = "İşleniyor...";
+
+/* Araç Çubuğu */
+"sub.toolbar.upgrade"           = "Yükselt";
+
+/* Satın Alma Geri Yükleme */
+"sub.restore.button"            = "Satın Alımları Geri Yükle";
+"sub.restore.none_found"        = "Önceki satın alım bulunamadı.";
+
+/* Alt Bilgi */
+"sub.footer.cancel"             = "İstediğiniz zaman iptal edebilirsiniz. Dönem bitiminden en az 24 saat önce iptal edilmezse abonelik otomatik olarak yenilenir.";
+/* TODO: REVENUECAT — SubscriptionView.footerSection içine gerçek URL'leri ekle */
+"sub.footer.terms"              = "Kullanım Koşulları";
+"sub.footer.privacy"            = "Gizlilik Politikası";
+
+/* Hata Uyarısı */
+"sub.error.title"               = "Satın Alma Başarısız";
+
+/* Süresi Dolmuş Banner (DomainListView'da gösterilir) */
+"sub.expired.banner.title"      = "Abonelik Süresi Doldu";
+"sub.expired.banner.message"    = "Erişiminiz sona erdi. Kumar sitelerini engellemeye devam etmek için yükseltin.";
+"sub.expired.banner.cta"        = "Yükselt";
+
+/* ============================================================
+   Butonlar
+   ============================================================ */
+"button.get_started"            = "Başla";
+"button.learn_more"             = "Daha Fazla Bilgi";
+"button.continue"               = "Devam Et";
+"button.cancel"                 = "İptal";
+"button.done"                   = "Tamam";
+"button.signout"                = "Çıkış Yap";
+"button.back"                   = "Geri";
+"button.retry"                  = "Tekrar Dene";
 
 /* Gezinme */
-"nav.home"                     = "Ana Sayfa";
-"nav.settings"                 = "Ayarlar";
-"nav.about"                    = "Hakkında";
+"nav.home"                      = "Ana Sayfa";
+"nav.settings"                  = "Ayarlar";
+"nav.about"                     = "Hakkında";
 
-/* Hatalar */
-"error.generic"                = "Bir şeyler ters gitti. Lütfen tekrar deneyin.";
-"error.network"                = "İnternet bağlantısı yok.";
-"error.no_response"            = "Sunucudan yanıt alınamadı.";
-"error.request_failed"         = "İstek başarısız";
-"error.unauthorized"           = "Geçersiz API anahtarı.";
-"error.subscription_expired"   = "Abonelik süreniz dolmuştur.";
+/* ============================================================
+   Hatalar
+   ============================================================ */
+"error.generic"                 = "Bir şeyler ters gitti. Lütfen tekrar deneyin.";
+"error.network"                 = "İnternet bağlantısı yok.";
+"error.no_response"             = "Sunucudan yanıt alınamadı.";
+"error.request_failed"          = "İstek başarısız";
+"error.unauthorized"            = "Geçersiz API anahtarı.";
+"error.subscription_expired"    = "Abonelik süreniz dolmuştur.";

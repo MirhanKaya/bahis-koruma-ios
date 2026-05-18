@@ -4,6 +4,7 @@ import SwiftUI
 
 struct DomainListView: View {
     @EnvironmentObject var viewModel: AppViewModel
+    @EnvironmentObject var subscriptionVM: SubscriptionViewModel
     @State private var showLogoutConfirm = false
 
     var body: some View {
@@ -13,7 +14,7 @@ struct DomainListView: View {
                     loadingView
                 } else if let error = viewModel.domainsError, viewModel.domains.isEmpty {
                     errorView(message: error)
-                } else if viewModel.domains.isEmpty {
+                } else if viewModel.domains.isEmpty && !viewModel.isLoadingDomains {
                     emptyView
                 } else {
                     domainList
@@ -24,6 +25,13 @@ struct DomainListView: View {
             .toolbar { toolbarItems }
         }
         .task { await viewModel.loadDomains() }
+        // Paywall sheet — shown when API returns 403 or user taps Upgrade
+        .sheet(isPresented: $viewModel.showSubscription) {
+            SubscriptionView(isDismissable: true) {
+                viewModel.showSubscription = false
+            }
+            .environmentObject(subscriptionVM)
+        }
         .confirmationDialog(
             L("domains.logout.title"),
             isPresented: $showLogoutConfirm,
@@ -43,12 +51,28 @@ struct DomainListView: View {
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .navigationBarTrailing) {
-            Button {
-                Task { await viewModel.loadDomains() }
-            } label: {
-                Image(systemName: "arrow.clockwise")
+            HStack(spacing: 12) {
+                // Upgrade button — visible only when subscription expired
+                if subscriptionVM.isExpired {
+                    Button {
+                        viewModel.showSubscription = true
+                    } label: {
+                        Text(L("sub.toolbar.upgrade"))
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(Color(hex: "#e63946"))
+                            .cornerRadius(8)
+                    }
+                }
+                Button {
+                    Task { await viewModel.loadDomains() }
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .disabled(viewModel.isLoadingDomains)
             }
-            .disabled(viewModel.isLoadingDomains)
         }
         ToolbarItem(placement: .navigationBarLeading) {
             Button {
@@ -68,7 +92,16 @@ struct DomainListView: View {
 
     private var domainList: some View {
         List {
-            // Stats
+            // Expired subscription banner (inline, dismissable)
+            if subscriptionVM.isExpired {
+                Section {
+                    expiredBanner
+                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                }
+                .listRowBackground(Color.clear)
+            }
+
+            // Stats cards
             Section {
                 statsHeader
                     .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
@@ -87,12 +120,53 @@ struct DomainListView: View {
             await viewModel.loadDomains()
         }
         .overlay(alignment: .top) {
-            // Inline loading indicator during refresh
             if viewModel.isLoadingDomains && !viewModel.domains.isEmpty {
                 ProgressView()
                     .padding(.top, 8)
             }
         }
+    }
+
+    // MARK: - Expired Subscription Banner
+
+    private var expiredBanner: some View {
+        HStack(spacing: 14) {
+            Image(systemName: "exclamationmark.shield.fill")
+                .font(.system(size: 28))
+                .foregroundColor(Color(hex: "#e63946"))
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(L("sub.expired.banner.title"))
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.primary)
+                Text(L("sub.expired.banner.message"))
+                    .font(.system(size: 13))
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer()
+
+            Button {
+                viewModel.showSubscription = true
+            } label: {
+                Text(L("sub.expired.banner.cta"))
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color(hex: "#e63946"))
+                    .cornerRadius(8)
+            }
+        }
+        .padding(16)
+        .background(Color(hex: "#e63946").opacity(0.08))
+        .overlay(
+            Rectangle()
+                .frame(width: 4)
+                .foregroundColor(Color(hex: "#e63946")),
+            alignment: .leading
+        )
     }
 
     // MARK: - Stats Header
@@ -197,7 +271,6 @@ private struct DomainRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            // Status icon
             ZStack {
                 RoundedRectangle(cornerRadius: 9)
                     .fill(statusColor.opacity(0.12))
@@ -289,4 +362,5 @@ private struct StatCard: View {
 #Preview {
     DomainListView()
         .environmentObject(AppViewModel())
+        .environmentObject(SubscriptionViewModel())
 }

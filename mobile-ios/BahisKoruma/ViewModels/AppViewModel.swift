@@ -21,6 +21,11 @@ final class AppViewModel: ObservableObject {
     @Published var apiKey: String = ""
     @Published var user: UserResponse?
 
+    // MARK: Subscription Sheet
+    /// Set to true to present SubscriptionView as a sheet.
+    /// Triggered automatically when the API returns 403 (subscription expired).
+    @Published var showSubscription = false
+
     // MARK: Register State
     @Published var isRegistering = false
     @Published var registerError: String?
@@ -31,7 +36,6 @@ final class AppViewModel: ObservableObject {
     @Published var domainsError: String?
 
     // MARK: Local Storage
-    /// Key used with UserDefaults to persist the API key between app launches.
     private let apiKeyStorageKey = "bahiskoruma.apiKey"
 
     // MARK: Init
@@ -45,8 +49,9 @@ final class AppViewModel: ObservableObject {
     }
 
     // MARK: - Registration
+    // Calls POST /register-api-user, persists apiKey, sets user (plan + expiresAt).
+    // BahisKorumaApp observes user?.apiKey change → calls subscriptionVM.configure().
 
-    /// Calls POST /register-api-user, stores the returned apiKey, and navigates to domains.
     func register(email: String) async {
         guard isValidEmail(email) else {
             registerError = L("register.error.invalid_email")
@@ -67,14 +72,15 @@ final class AppViewModel: ObservableObject {
         isRegistering = false
     }
 
-    /// Clears the register error — call when the user edits the email field.
     func clearRegisterError() {
         registerError = nil
     }
 
     // MARK: - Domain Loading
+    // Calls GET /domains with x-api-key header.
+    // 401 → auth error displayed in UI.
+    // 403 → subscription expired → showSubscription = true (triggers paywall sheet).
 
-    /// Calls GET /domains with the stored apiKey via x-api-key header.
     func loadDomains() async {
         guard !apiKey.isEmpty else { return }
 
@@ -83,6 +89,9 @@ final class AppViewModel: ObservableObject {
 
         do {
             domains = try await APIService.fetchDomains(apiKey: apiKey)
+        } catch APIError.subscriptionExpired {
+            // Do not show a generic error — show the paywall instead
+            showSubscription = true
         } catch {
             domainsError = error.localizedDescription
         }
@@ -97,16 +106,16 @@ final class AppViewModel: ObservableObject {
         screen = .register
     }
 
-    /// Clears all stored state and returns to the welcome screen.
     func logout() {
         apiKey = ""
         user = nil
         domains = []
+        showSubscription = false
         UserDefaults.standard.removeObject(forKey: apiKeyStorageKey)
         screen = .welcome
     }
 
-    // MARK: - Private Helpers
+    // MARK: - Private
 
     private func persistApiKey(_ key: String) {
         apiKey = key
