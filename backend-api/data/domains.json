@@ -194,5 +194,12 @@
     "category": "gambling",
     "isBlocked": true,
     "createdAt": "2026-05-18T13:39:57.882Z"
+  },
+  {
+    "id": 30,
+    "domain": "casino-vip-tr.net",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:40:57.884Z"
   }
 ]
