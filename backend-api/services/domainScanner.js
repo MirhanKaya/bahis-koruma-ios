@@ -68,19 +68,20 @@ async function scanTick() {
   for (const raw of batch) {
     const domain = raw.toLowerCase().trim();
 
-    if (!isGambling(domain))   continue;  // benign domain — skip
-    if (existingNames.has(domain)) continue;  // already in storage — skip
+    if (!isGambling(domain))       continue; // benign domain — skip
+    if (existingNames.has(domain)) continue; // already in storage — skip
     if (_seenThisSession.has(domain)) continue; // added earlier this session — skip
 
     toAdd.push(domain);
     _seenThisSession.add(domain);
-    existingNames.add(domain);  // prevent double-add within same tick
+    existingNames.add(domain); // prevent double-add within same tick
   }
 
   if (!toAdd.length) return;
 
-  // ── Persist to local JSON ──────────────────────────────────────────────────
-  const fresh = readDomains(); // re-read to avoid race conditions
+  // ── Build entries ─────────────────────────────────────────────────────────
+  // Re-read inside the critical section to guard against concurrent writes.
+  const fresh = readDomains();
   const added = [];
 
   for (const domain of toAdd) {
@@ -100,6 +101,9 @@ async function scanTick() {
 
   if (!added.length) return;
 
+  // ── Persist to local JSON only once per new domain ─────────────────────────
+  // writeDomains is called a single time after all new entries are assembled,
+  // preventing repeated file writes that dirty the git worktree on every tick.
   writeDomains(fresh);
 
   // ── Firestore sync (fire-and-forget) ──────────────────────────────────────

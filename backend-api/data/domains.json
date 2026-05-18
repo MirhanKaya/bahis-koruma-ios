@@ -173,5 +173,26 @@
     "category": "gambling",
     "isBlocked": true,
     "createdAt": "2026-05-18T13:37:10.694Z"
+  },
+  {
+    "id": 27,
+    "domain": "casino-bonus-tr.net",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:39:10.715Z"
+  },
+  {
+    "id": 28,
+    "domain": "bigslot.casino",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:39:10.715Z"
+  },
+  {
+    "id": 29,
+    "domain": "poker-club-tr.com",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:39:57.882Z"
   }
 ]
