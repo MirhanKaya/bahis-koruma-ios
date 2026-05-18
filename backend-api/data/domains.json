@@ -124,5 +124,26 @@
     "category": "gambling",
     "isBlocked": true,
     "createdAt": "2026-05-18T13:32:10.630Z"
+  },
+  {
+    "id": 20,
+    "domain": "test-casino.net",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:33:10.647Z"
+  },
+  {
+    "id": 21,
+    "domain": "slot-oyunlari.com",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:34:10.661Z"
+  },
+  {
+    "id": 22,
+    "domain": "live-bet.app",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:34:10.661Z"
   }
 ]
