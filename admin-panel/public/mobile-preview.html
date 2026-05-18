@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bahis Koruma — Mobil Simülatör</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; background: #0a0a18; font-family: 'Inter', -apple-system, sans-serif; overflow: hidden; }
+
+    /* ── Page layout ─────────────────────────────────────────────────── */
+    .page {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Left sidebar ─────────────────────────────────────────────────── */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: #111128;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      gap: 6px;
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 8px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 12px;
+    }
+    .sidebar-logo .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #2a9d8f, #1a7a6f);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sidebar-logo .logo-icon .material-icons-round { font-size: 18px; color: #fff; }
+    .sidebar-logo .logo-text { font-size: 14px; font-weight: 700; color: #fff; }
+    .sidebar-logo .logo-sub  { font-size: 10px; color: rgba(255,255,255,0.35); }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      background: none;
+      color: rgba(255,255,255,0.45);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-btn .material-icons-round { font-size: 18px; }
+    .nav-btn:hover  { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
+    .nav-btn.active { background: rgba(42,157,143,0.15); color: #2a9d8f; }
+    .nav-btn.active .material-icons-round { color: #2a9d8f; }
+
+    .sidebar-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 14px 12px 4px;
+    }
+
+    .back-link {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      color: rgba(255,255,255,0.3);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: rgba(255,255,255,0.6); }
+    .back-link .material-icons-round { font-size: 16px; }
+
+    /* ── Main area ────────────────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Top bar ─────────────────────────────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    .topbar h1 { font-size: 16px; font-weight: 700; color: #fff; }
+    .topbar .sub { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+    .api-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+    }
+    .api-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: #888; flex-shrink: 0; }
+    .api-pill .dot.online { background: #4caf50; box-shadow: 0 0 6px rgba(76,175,80,0.5); }
+    .api-pill .dot.offline { background: #e63946; }
+
+    /* ── Content area with phone ─────────────────────────────────────── */
+    .content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      overflow: auto;
+      padding: 24px;
+    }
+
+    /* ── Phone shell ─────────────────────────────────────────────────── */
+    .phone-wrap { position: relative; }
+    .phone-shell {
+      width: 375px;
+      height: 812px;
+      background: #1a1a2e;
+      border-radius: 48px;
+      box-shadow:
+        0 0 0 2px #252545,
+        0 0 0 4px #1a1a32,
+        0 40px 100px rgba(0,0,0,0.85),
+        inset 0 1px 0 rgba(255,255,255,0.07);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    /* Dynamic island */
+    .phone-shell::before {
+      content: '';
+      position: absolute;
+      top: 12px; left: 50%;
+      transform: translateX(-50%);
+      width: 110px; height: 30px;
+      background: #0d0d1a;
+      border-radius: 18px;
+      z-index: 200;
+    }
+    /* Status bar */
+    .status-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 26px 6px;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .status-bar .time { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+    .status-bar .icons { display: flex; align-items: center; gap: 4px; }
+    .status-bar .icons span { font-size: 14px; color: rgba(255,255,255,0.9); }
+
+    /* Screens container */
+    .screens { position: absolute; inset: 0; border-radius: 48px; overflow: hidden; }
+    .screen {
+      position: absolute; inset: 0;
+      background: #1a1a2e;
+      display: flex; flex-direction: column;
+      padding: 52px 0 0;
+      opacity: 0; pointer-events: none;
+    }
+    .screen.active { opacity: 1; pointer-events: all; }
+
+    /* ── Right panel: info + log ─────────────────────────────────────── */
+    .info-panel {
+      width: 300px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-self: flex-start;
+      padding-top: 8px;
+    }
+    .info-card {
+      background: #111128;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .info-card h3 {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 12px;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 13px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .key { color: rgba(255,255,255,0.4); }
+    .info-row .val { color: #fff; font-weight: 600; }
+    .info-row .val.green { color: #4caf50; }
+    .info-row .val.red   { color: #e63946; }
+    .info-row .val.teal  { color: #2a9d8f; }
+
+    .log-box {
+      background: #0a0a16;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      max-height: 200px;
+      overflow-y: auto;
+      line-height: 1.7;
+    }
+    .log-box::-webkit-scrollbar { display: none; }
+    .log-line { display: block; }
+    .log-line.ok   { color: #4caf50; }
+    .log-line.err  { color: #e63946; }
+    .log-line.info { color: #2a9d8f; }
+    .log-line.warn { color: #f4a261; }
+
+    /* ── Screen common components ─────────────────────────────────────── */
+    .px  { padding-left: 24px; padding-right: 24px; }
+    .gap-sm { height: 12px; flex-shrink: 0; }
+    .gap-md { height: 20px; flex-shrink: 0; }
+    .gap-lg { height: 32px; flex-shrink: 0; }
+
+    .scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .scroll::-webkit-scrollbar { display: none; }
+
+    .h1 { font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+    .h2 { font-size: 20px; font-weight: 700; color: #fff; }
+    .body-text { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+    .caption { font-size: 12px; color: rgba(255,255,255,0.3); }
+
+    /* Fields */
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    .field-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; }
+    .field-wrap { position: relative; }
+    .field-wrap .material-icons-round { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; color: rgba(255,255,255,0.3); pointer-events: none; }
+    input[type=text], input[type=email], input[type=password] {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.09);
+      border-radius: 13px;
+      padding: 13px 14px 13px 42px;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    input:focus { border-color: #2a9d8f; }
+    input::placeholder { color: rgba(255,255,255,0.22); }
+
+    /* Buttons */
+    .btn-primary {
+      width: 100%; height: 52px;
+      background: #2a9d8f;
+      color: #fff;
+      border: none; border-radius: 15px;
+      font-size: 15px; font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: transform 0.12s, opacity 0.12s;
+    }
+    .btn-primary:active { transform: scale(0.97); opacity: 0.9; }
+    .btn-primary.danger { background: #e63946; }
+    .btn-primary.stop   { background: #e63946; }
+
+    .spin-sm { width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.25); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Bottom nav */
+    .bottom-nav {
+      display: flex;
+      background: rgba(8,8,20,0.92);
+      backdrop-filter: blur(20px);
+      padding: 10px 16px 14px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      flex-shrink: 0;
+    }
+    .bnav-item {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      background: none; border: none; cursor: pointer;
+      padding: 5px 0; border-radius: 10px;
+      transition: background 0.15s;
+    }
+    .bnav-item .material-icons-round { font-size: 22px; color: rgba(255,255,255,0.28); transition: color 0.2s; }
+    .bnav-item .lbl { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.28); font-family: 'Inter', sans-serif; transition: color 0.2s; }
+    .bnav-item.active .material-icons-round { color: #2a9d8f; }
+    .bnav-item.active .lbl { color: #2a9d8f; }
+
+    /* ── SCREEN 1: Splash ─────────────────────────────────────────────── */
+    #s-splash {
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, #1a1a2e 0%, #12122a 100%);
+      padding: 0;
+    }
+    #s-splash.active { animation: splFade 2.4s ease forwards; }
+    @keyframes splFade { 0%,60%{opacity:1} 85%,100%{opacity:0} }
+    .splash-glow {
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(42,157,143,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .splash-logo {
+      width: 88px; height: 88px;
+      background: linear-gradient(135deg, #2a9d8f 0%, #1a7a6f 100%);
+      border-radius: 26px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 16px 48px rgba(42,157,143,0.4);
+      margin-bottom: 28px;
+      position: relative;
+    }
+    .splash-logo .material-icons-round { font-size: 46px; color: #fff; }
+    .splash-app-name { font-size: 30px; font-weight: 800; color: #fff; letter-spacing: -1px; position: relative; }
+    .splash-tagline  { font-size: 13px; color: rgba(255,255,255,0.38); margin-top: 8px; position: relative; }
+    .splash-loader {
+      margin-top: 64px; width: 32px; height: 32px;
+      border: 3px solid rgba(255,255,255,0.08);
+      border-top-color: #2a9d8f;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      position: relative;
+    }
+    .splash-ver { position: absolute; bottom: 40px; font-size: 11px; color: rgba(255,255,255,0.2); }
+
+    /* ── SCREEN 2: Login ──────────────────────────────────────────────── */
+    .login-header { padding: 20px 24px 0; flex-shrink: 0; }
+    .welcome-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(42,157,143,0.1); border: 1px solid rgba(42,157,143,0.22);
+      border-radius: 20px; padding: 4px 12px;
+      font-size: 11px; font-weight: 600; color: #2a9d8f;
+      margin-bottom: 14px;
+    }
+    .welcome-badge .material-icons-round { font-size: 13px; }
+    #s-login .scroll { padding: 8px 24px 24px; }
+
+    /* ── SCREEN 3: Dashboard ──────────────────────────────────────────── */
+    #s-dashboard { padding-bottom: 0; }
+    .dash-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 20px 0; flex-shrink: 0;
+    }
+    .dash-topbar .app-title { font-size: 17px; font-weight: 700; color: #fff; }
+    .dash-topbar .sos-quick {
+      background: rgba(230,57,70,0.12);
+      border: 1px solid rgba(230,57,70,0.3);
+      border-radius: 10px;
+      padding: 6px 10px;
+      display: flex; align-items: center; gap: 4px;
+      color: #e63946; font-size: 11px; font-weight: 700;
+      font-family: 'Inter', sans-serif; cursor: pointer;
+      border: none; border: 1px solid rgba(230,57,70,0.3);
+    }
+    .dash-topbar .sos-quick .material-icons-round { font-size: 14px; }
+
+    .vpn-hero {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 20px 24px 16px; flex-shrink: 0;
+    }
+    .shield-ring {
+      width: 148px; height: 148px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; margin-bottom: 16px;
+      transition: all 0.4s ease;
+    }
+    .shield-ring.off { background: rgba(255,255,255,0.04); box-shadow: 0 0 0 1px rgba(255,255,255,0.06); }
+    .shield-ring.on  { background: rgba(42,157,143,0.1);  box-shadow: 0 0 0 1px rgba(42,157,143,0.3), 0 0 36px rgba(42,157,143,0.15); }
+    .shield-ring .material-icons-round { font-size: 80px; transition: color 0.4s; }
+    .shield-ring.off .material-icons-round { color: rgba(255,255,255,0.16); }
+    .shield-ring.on  .material-icons-round { color: #2a9d8f; }
+    .vpn-title { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.4px; }
+    .vpn-status { font-size: 13px; margin-top: 5px; transition: color 0.4s; }
+    .vpn-status.off { color: rgba(255,255,255,0.32); }
+    .vpn-status.on  { color: #2a9d8f; }
+
+    .dash-cards {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      padding: 0 16px; flex-shrink: 0;
+    }
+    .dash-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px; padding: 12px 14px;
+    }
+    .dash-card .card-icon { font-size: 20px; margin-bottom: 5px; }
+    .dash-card .card-icon.red  { color: #e63946; }
+    .dash-card .card-icon.teal { color: #2a9d8f; }
+    .dash-card .card-icon.blue { color: #4895ef; }
+    .dash-card .card-icon.gold { color: #f4a261; }
+    .dash-card .card-val { font-size: 20px; font-weight: 800; color: #fff; }
+    .dash-card .card-lbl { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 1px; }
+
+    .dash-toggle-wrap { padding: 12px 16px 0; flex-shrink: 0; }
+    .dash-toggle-btn {
+      width: 100%; height: 50px;
+      border: none; border-radius: 16px;
+      font-size: 15px; font-weight: 700;
+      font-family: 'Inter', sans-serif; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: transform 0.12s, background 0.3s;
+    }
+    .dash-toggle-btn:active { transform: scale(0.97); }
+    .dash-toggle-btn.start { background: #2a9d8f; color: #fff; }
+    .dash-toggle-btn.stop  { background: #e63946; color: #fff; }
+
+    .mini-list-wrap {
+      flex: 1; min-height: 0; display: flex; flex-direction: column;
+      margin-top: 12px;
+    }
+    .mini-list-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px 8px;
+    }
+    .mini-list-header span { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; }
+    .mini-list-header button {
+      background: none; border: none; font-size: 11px; font-weight: 600;
+      color: #2a9d8f; font-family: 'Inter', sans-serif; cursor: pointer;
+    }
+    .mini-list {
+      flex: 1; min-height: 0; overflow-y: auto; padding: 0 10px;
+    }
+    .mini-list::-webkit-scrollbar { display: none; }
+    .mini-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 10px; border-radius: 10px;
+    }
+    .mini-row:active { background: rgba(255,255,255,0.04); }
+    .mini-row .dom { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.7); }
+    .mini-row .pill-sm {
+      font-size: 10px; font-weight: 600;
+      padding: 2px 8px; border-radius: 10px;
+      background: rgba(230,57,70,0.12); color: #e86370;
+    }
+    .mini-row .pill-sm.ok {
+      background: rgba(42,157,143,0.12); color: #2a9d8f;
+    }
+
+    /* ── SCREEN 4: Kalkan Kurulumu ────────────────────────────────────── */
+    .setup-header { padding: 16px 24px 0; flex-shrink: 0; }
+    .setup-back {
+      background: none; border: none; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      color: rgba(255,255,255,0.45); font-size: 13px;
+      font-family: 'Inter', sans-serif; padding: 0; margin-bottom: 20px;
+    }
+    .setup-back .material-icons-round { font-size: 18px; }
+
+    .step-progress {
+      display: flex; gap: 6px; margin-bottom: 20px;
+    }
+    .step-bar {
+      flex: 1; height: 4px; border-radius: 4px;
+      background: rgba(255,255,255,0.08);
+      transition: background 0.3s;
+    }
+    .step-bar.done    { background: #2a9d8f; }
+    .step-bar.current { background: rgba(42,157,143,0.5); }
+
+    .setup-body { flex: 1; min-height: 0; overflow-y: auto; padding: 0 24px 24px; }
+    .setup-body::-webkit-scrollbar { display: none; }
+
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+
+    .step-icon-wrap {
+      width: 64px; height: 64px; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .step-icon-wrap.teal   { background: rgba(42,157,143,0.15); }
+    .step-icon-wrap.blue   { background: rgba(72,149,239,0.15); }
+    .step-icon-wrap.green  { background: rgba(76,175,80,0.15); }
+    .step-icon-wrap .material-icons-round { font-size: 32px; }
+    .step-icon-wrap.teal  .material-icons-round { color: #2a9d8f; }
+    .step-icon-wrap.blue  .material-icons-round { color: #4895ef; }
+    .step-icon-wrap.green .material-icons-round { color: #4caf50; }
+
+    .step-title { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+    .step-desc  { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; margin-bottom: 20px; }
+
+    .step-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+    .step-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 12px;
+    }
+    .step-item .item-icon { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-item .item-icon .material-icons-round { font-size: 18px; }
+    .step-item .item-icon.teal { background: rgba(42,157,143,0.15); }
+    .step-item .item-icon.teal .material-icons-round { color: #2a9d8f; }
+    .step-item .item-icon.blue { background: rgba(72,149,239,0.15); }
+    .step-item .item-icon.blue .material-icons-round { color: #4895ef; }
+    .step-item .item-text { flex: 1; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.75); }
+    .step-item .item-check { font-size: 18px; color: #4caf50; }
+    .step-item .item-check.hidden { visibility: hidden; }
+
+    .success-badge {
+      text-align: center; padding: 20px 0 24px;
+    }
+    .success-badge .big-check {
+      width: 80px; height: 80px; border-radius: 28px;
+      background: rgba(76,175,80,0.12);
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .success-badge .big-check .material-icons-round { font-size: 44px; color: #4caf50; }
+    .success-badge h2 { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+    .success-badge p  { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.6; }
+
+    .setup-footer { padding: 12px 24px 16px; flex-shrink: 0; }
+
+    /* ── SCREEN 5: Buddy SOS ─────────────────────────────────────────── */
+    #s-buddy { padding-bottom: 0; }
+    .buddy-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 24px 0; flex-shrink: 0;
+    }
+    .buddy-header .back-btn {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.06);
+      border: none; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: rgba(255,255,255,0.7);
+      flex-shrink: 0;
+    }
+    .buddy-header .back-btn .material-icons-round { font-size: 20px; }
+    .buddy-header h2 { font-size: 16px; font-weight: 700; color: #fff; }
+
+    .buddy-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 24px 24px; }
+    .buddy-scroll::-webkit-scrollbar { display: none; }
+
+    .buddy-user-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px; padding: 16px;
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .buddy-avatar {
+      width: 48px; height: 48px; border-radius: 16px;
+      background: linear-gradient(135deg, #2a9d8f, #1a7a6f);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .buddy-avatar .material-icons-round { font-size: 26px; color: #fff; }
+    .buddy-user-info .name { font-size: 15px; font-weight: 700; color: #fff; }
+    .buddy-user-info .phone { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+    .buddy-section-title {
+      font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.28);
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;
+    }
+
+    .buddy-field-wrap { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+
+    .sos-big-btn {
+      width: 100%; height: 64px;
+      background: linear-gradient(135deg, rgba(230,57,70,0.18), rgba(230,57,70,0.1));
+      border: 1.5px solid rgba(230,57,70,0.4);
+      border-radius: 20px;
+      color: #e63946;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px; font-weight: 800;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: transform 0.12s, background 0.2s;
+      margin-bottom: 10px;
+      letter-spacing: 0.2px;
+    }
+    .sos-big-btn:active { transform: scale(0.97); background: rgba(230,57,70,0.25); }
+    .sos-big-btn .material-icons-round { font-size: 24px; }
+    .sos-caption { font-size: 11px; color: rgba(255,255,255,0.25); text-align: center; line-height: 1.5; }
+
+    .sos-history { margin-top: 20px; }
+    .history-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px; margin-bottom: 4px;
+    }
+    .history-row .hist-dot { width: 8px; height: 8px; border-radius: 50%; background: #2a9d8f; flex-shrink: 0; }
+    .history-row .hist-text { flex: 1; font-size: 12px; color: rgba(255,255,255,0.5); }
+    .history-row .hist-time { font-size: 10px; color: rgba(255,255,255,0.2); }
+
+    /* ── SOS Overlay popup ────────────────────────────────────────────── */
+    .sos-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 32px 20px;
+      border-radius: 48px;
+      z-index: 500;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.22s;
+    }
+    .sos-overlay.show { opacity: 1; pointer-events: all; }
+    .sos-popup-card {
+      background: #1e1e38;
+      border: 1px solid rgba(230,57,70,0.2);
+      border-radius: 22px; padding: 28px 22px; width: 100%; text-align: center;
+    }
+    .sos-popup-icon { font-size: 42px; color: #e63946; margin-bottom: 12px; }
+    .sos-popup-title { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 10px; }
+    .sos-popup-msg { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.65; }
+    .sos-popup-sent { font-size: 15px; font-weight: 700; color: #2a9d8f; margin-top: 14px; display: none; }
+
+    /* ── Animations ───────────────────────────────────────────────────── */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp 0.35s ease both; }
+    .d1 { animation-delay: 0.06s; } .d2 { animation-delay: 0.12s; }
+    .d3 { animation-delay: 0.18s; } .d4 { animation-delay: 0.24s; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────── -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><span class="material-icons-round">security</span></div>
+      <div>
+        <div class="logo-text">Bahis Koruma</div>
+        <div class="logo-sub">Mobil Simülatör</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section-title">Ekranlar</div>
+    <button class="nav-btn" onclick="jumpTo('s-splash')">
+      <span class="material-icons-round">play_circle</span> Splash
+    </button>
+    <button class="nav-btn" onclick="jumpTo('s-login')">
+      <span class="material-icons-round">login</span> Giriş Ekranı
+    </button>
+    <button class="nav-btn active" id="nb-dashboard" onclick="jumpTo('s-dashboard')">
+      <span class="material-icons-round">security</span> VPN Dashboard
+    </button>
+    <button class="nav-btn" id="nb-setup" onclick="jumpTo('s-setup')">
+      <span class="material-icons-round">build_circle</span> Kalkan Kurulumu
+    </button>
+    <button class="nav-btn" id="nb-buddy" onclick="jumpTo('s-buddy')">
+      <span class="material-icons-round">sos</span> Buddy SOS
+    </button>
+
+    <div class="sidebar-section-title" style="margin-top:8px">Aksiyon</div>
+    <button class="nav-btn" onclick="loadDomains()">
+      <span class="material-icons-round">refresh</span> API Yenile
+    </button>
+    <button class="nav-btn" onclick="testApi()">
+      <span class="material-icons-round">bolt</span> API Sağlık Testi
+    </button>
+
+    <a href="/" class="back-link">
+      <span class="material-icons-round">arrow_back</span>
+      Admin Paneline Dön
+    </a>
+  </div>
+
+  <!-- ── Main ───────────────────────────────────────────────────────── -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#fff">Mobil Uygulama Simülatörü</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:2px">Backend API (Port 8000) ile canlı bağlantı</div>
+      </div>
+      <div class="api-pill">
+        <div class="dot" id="apiDot"></div>
+        <span id="apiLabel">Kontrol ediliyor...</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- Phone -->
+      <div class="phone-wrap">
+        <div class="phone-shell">
+
+          <div class="status-bar">
+            <span class="time" id="statusTime">9:41</span>
+            <div class="icons">
+              <span class="material-icons-round" style="font-size:14px">signal_cellular_alt</span>
+              <span class="material-icons-round" style="font-size:14px">wifi</span>
+              <span class="material-icons-round" style="font-size:14px">battery_full</span>
+            </div>
+          </div>
+
+          <div class="screens">
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- SCREEN 1: SPLASH                                        -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div id="s-splash" class="screen active">
+              <div class="splash-glow"></div>
+              <div class="splash-logo"><span class="material-icons-round">security</span></div>
+              <div class="splash-app-name">Bahis Koruma</div>
+              <div class="splash-tagline">Kumar sitelerini otomatik engelle</div>
+              <div class="splash-loader"></div>
+              <div class="splash-ver">v2.1.0 — Simülatör</div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- SCREEN 2: LOGIN                                          -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div id="s-login" class="screen">
+              <div class="login-header">
+                <div class="welcome-badge">
+                  <span class="material-icons-round">verified_user</span>
+                  Güvenli Bağlantı
+                </div>
+                <div class="h1 fade-up">Hoş Geldin</div>
+                <div class="gap-sm"></div>
+                <div class="body-text fade-up d1">Hesabına giriş yap, korumayı başlat.</div>
+              </div>
+              <div class="gap-md"></div>
+              <div class="scroll">
+                <div class="field-group fade-up d1">
+                  <div class="field-label">E-posta</div>
+                  <div class="field-wrap">
+                    <span class="material-icons-round">mail</span>
+                    <input type="email" id="loginEmail" placeholder="ornek@email.com" value="kullanici@bahiskoruma.app">
+                  </div>
+                </div>
+                <div class="gap-sm"></div>
+                <div class="field-group fade-up d2">
+                  <div class="field-label">Şifre</div>
+                  <div class="field-wrap">
+                    <span class="material-icons-round">lock</span>
+                    <input type="password" id="loginPass" placeholder="••••••••" value="••••••••">
+                  </div>
+                </div>
+                <div class="gap-md"></div>
+                <button class="btn-primary fade-up d3" id="loginBtn" onclick="doLogin()">
+                  <span class="material-icons-round">login</span>
+                  Giriş Yap
+                </button>
+                <div class="gap-md"></div>
+                <div style="text-align:center">
+                  <button style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:13px;font-family:Inter,sans-serif;cursor:pointer" onclick="jumpTo('s-setup')">
+                    İlk defa kullanıyorum → Kalkan Kur
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- SCREEN 3: VPN DASHBOARD                                 -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div id="s-dashboard" class="screen">
+              <div class="dash-topbar">
+                <span class="app-title">Bahis Koruma</span>
+                <button class="sos-quick" onclick="navigate('s-buddy',false)">
+                  <span class="material-icons-round">sos</span>
+                  SOS
+                </button>
+              </div>
+
+              <div class="vpn-hero">
+                <div class="shield-ring off" id="shieldRing">
+                  <span class="material-icons-round">security</span>
+                </div>
+                <div class="vpn-title">Bahis Koruma</div>
+                <div class="vpn-status off" id="vpnStatus">VPN Kapalı — Koruma devre dışı</div>
+              </div>
+
+              <div class="dash-cards">
+                <div class="dash-card">
+                  <div class="card-icon red material-icons-round">block</div>
+                  <div class="card-val" id="cardBlocked">—</div>
+                  <div class="card-lbl">Engellenen</div>
+                </div>
+                <div class="dash-card">
+                  <div class="card-icon teal material-icons-round">check_circle</div>
+                  <div class="card-val" id="cardVpnState">Pasif</div>
+                  <div class="card-lbl">VPN Durumu</div>
+                </div>
+                <div class="dash-card">
+                  <div class="card-icon blue material-icons-round">dns</div>
+                  <div class="card-val">DNS</div>
+                  <div class="card-lbl">Filtreleme</div>
+                </div>
+                <div class="dash-card">
+                  <div class="card-icon gold material-icons-round">workspace_premium</div>
+                  <div class="card-val">Pro</div>
+                  <div class="card-lbl">Plan</div>
+                </div>
+              </div>
+
+              <div class="dash-toggle-wrap">
+                <button class="dash-toggle-btn start" id="vpnToggleBtn" onclick="toggleVpn()">
+                  <span class="material-icons-round">power_settings_new</span>
+                  VPN'yi Başlat
+                </button>
+              </div>
+
+              <div class="mini-list-wrap">
+                <div class="mini-list-header">
+                  <span>Engel Listesi</span>
+                  <button onclick="loadDomains()">Yenile</button>
+                </div>
+                <div class="mini-list" id="miniList">
+                  <div style="text-align:center;padding:16px;color:rgba(255,255,255,0.2);font-size:12px">Yükleniyor...</div>
+                </div>
+              </div>
+
+              <div class="bottom-nav">
+                <button class="bnav-item active" onclick="navigate('s-dashboard',false)">
+                  <span class="material-icons-round">security</span>
+                  <span class="lbl">VPN</span>
+                </button>
+                <button class="bnav-item" onclick="navigate('s-setup',false)">
+                  <span class="material-icons-round">build_circle</span>
+                  <span class="lbl">Kurulum</span>
+                </button>
+                <button class="bnav-item" onclick="navigate('s-buddy',false)">
+                  <span class="material-icons-round">sos</span>
+                  <span class="lbl">SOS</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- SCREEN 4: KALKAN KURULUMU                               -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div id="s-setup" class="screen">
+              <div class="setup-header">
+                <button class="setup-back" onclick="navigate('s-dashboard',true)">
+                  <span class="material-icons-round">arrow_back_ios</span>
+                  Dashboard
+                </button>
+                <div class="step-progress">
+                  <div class="step-bar done"    id="bar1"></div>
+                  <div class="step-bar current" id="bar2"></div>
+                  <div class="step-bar"         id="bar3"></div>
+                </div>
+                <div class="h2" id="setupStepLabel">Adım 1 / 3</div>
+              </div>
+
+              <div class="setup-body">
+
+                <!-- Step 1: DNS -->
+                <div class="step-panel active" id="step1">
+                  <div class="gap-sm"></div>
+                  <div class="step-icon-wrap teal">
+                    <span class="material-icons-round">dns</span>
+                  </div>
+                  <div class="step-title">DNS Yapılandırması</div>
+                  <div class="step-desc">
+                    Cihazınıza özel DNS adresi atanıyor. Tüm kumar sitesi istekleri bu DNS üzerinden filtrelenecek.
+                  </div>
+                  <div class="step-list">
+                    <div class="step-item">
+                      <div class="item-icon teal"><span class="material-icons-round">check</span></div>
+                      <div class="item-text">DNS sunucusu seçildi: 185.220.101.1</div>
+                      <span class="material-icons-round item-check">check_circle</span>
+                    </div>
+                    <div class="step-item">
+                      <div class="item-icon teal"><span class="material-icons-round">filter_list</span></div>
+                      <div class="item-text">Engelleme listesi indirildi (<span id="dnsListCount">...</span> domain)</div>
+                      <span class="material-icons-round item-check">check_circle</span>
+                    </div>
+                    <div class="step-item">
+                      <div class="item-icon blue"><span class="material-icons-round">sync</span></div>
+                      <div class="item-text">Otomatik güncelleme aktif</div>
+                      <span class="material-icons-round item-check">check_circle</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step 2: VPN Profili -->
+                <div class="step-panel" id="step2">
+                  <div class="gap-sm"></div>
+                  <div class="step-icon-wrap blue">
+                    <span class="material-icons-round">vpn_lock</span>
+                  </div>
+                  <div class="step-title">VPN Profili</div>
+                  <div class="step-desc">
+                    Cihazınıza VPN yapılandırma profili yükleniyor. Bu profil tüm ağ trafiğini filtreler.
+                  </div>
+                  <div class="step-list">
+                    <div class="step-item">
+                      <div class="item-icon blue"><span class="material-icons-round">download</span></div>
+                      <div class="item-text">Profil dosyası indirildi</div>
+                      <span class="material-icons-round item-check">check_circle</span>
+                    </div>
+                    <div class="step-item">
+                      <div class="item-icon blue"><span class="material-icons-round">verified_user</span></div>
+                      <div class="item-text">Profil sertifikası doğrulandı</div>
+                      <span class="material-icons-round item-check" id="vpnCertCheck">check_circle</span>
+                    </div>
+                    <div class="step-item">
+                      <div class="item-icon teal"><span class="material-icons-round">smartphone</span></div>
+                      <div class="item-text">Cihaz kaydı tamamlandı</div>
+                      <span class="material-icons-round item-check hidden" id="vpnDevCheck">check_circle</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step 3: Tamamlandı -->
+                <div class="step-panel" id="step3">
+                  <div class="gap-md"></div>
+                  <div class="success-badge">
+                    <div class="big-check">
+                      <span class="material-icons-round">check_circle</span>
+                    </div>
+                    <h2>Kurulum Tamamlandı!</h2>
+                    <p>Kalkanınız aktif. Kumar siteleri artık bu cihazda erişilemez.</p>
+                  </div>
+                  <div class="step-list">
+                    <div class="step-item">
+                      <div class="item-icon green"><span class="material-icons-round">security</span></div>
+                      <div class="item-text">VPN Kalkanı — Aktif</div>
+                      <span class="material-icons-round item-check">check_circle</span>
+                    </div>
+                    <div class="step-item">
+                      <div class="item-icon green"><span class="material-icons-round">dns</span></div>
+                      <div class="item-text">DNS Filtresi — Aktif</div>
+                      <span class="material-icons-round item-check">check_circle</span>
+                    </div>
+                    <div class="step-item">
+                      <div class="item-icon green"><span class="material-icons-round">people</span></div>
+                      <div class="item-text">Buddy Bildirimi — Hazır</div>
+                      <span class="material-icons-round item-check">check_circle</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="setup-footer">
+                <button class="btn-primary" id="setupNextBtn" onclick="nextSetupStep()">
+                  <span id="setupBtnText">Devam Et</span>
+                  <span class="material-icons-round" id="setupBtnIcon">arrow_forward</span>
+                </button>
+              </div>
+
+              <div class="bottom-nav">
+                <button class="bnav-item" onclick="navigate('s-dashboard',true)">
+                  <span class="material-icons-round">security</span>
+                  <span class="lbl">VPN</span>
+                </button>
+                <button class="bnav-item active" onclick="navigate('s-setup',false)">
+                  <span class="material-icons-round">build_circle</span>
+                  <span class="lbl">Kurulum</span>
+                </button>
+                <button class="bnav-item" onclick="navigate('s-buddy',false)">
+                  <span class="material-icons-round">sos</span>
+                  <span class="lbl">SOS</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- SCREEN 5: BUDDY SOS                                     -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div id="s-buddy" class="screen">
+              <div class="buddy-header">
+                <button class="back-btn" onclick="navigate('s-dashboard',true)">
+                  <span class="material-icons-round">arrow_back_ios</span>
+                </button>
+                <h2>Güvenilir Yakın (Buddy)</h2>
+              </div>
+
+              <div class="buddy-scroll">
+                <div class="gap-md"></div>
+
+                <div class="buddy-user-card">
+                  <div class="buddy-avatar">
+                    <span class="material-icons-round">person_pin</span>
+                  </div>
+                  <div class="buddy-user-info">
+                    <div class="name" id="buddyDisplayName">Ahmet Abi</div>
+                    <div class="phone" id="buddyDisplayPhone">0532 123 4567</div>
+                  </div>
+                </div>
+
+                <div class="buddy-section-title">Yakın Bilgileri</div>
+                <div class="buddy-field-wrap">
+                  <div class="field-group">
+                    <div class="field-label">İsim</div>
+                    <div class="field-wrap">
+                      <span class="material-icons-round">person</span>
+                      <input type="text" id="buddyName" placeholder="Yakın adı" value="Ahmet Abi" oninput="updateBuddyDisplay()">
+                    </div>
+                  </div>
+                  <div class="field-group">
+                    <div class="field-label">Telefon</div>
+                    <div class="field-wrap">
+                      <span class="material-icons-round">phone</span>
+                      <input type="text" id="buddyPhone" placeholder="05XX XXX XXXX" value="0532 123 4567" oninput="updateBuddyDisplay()">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="gap-md"></div>
+                <div class="buddy-section-title">Acil Durum</div>
+                <button class="sos-big-btn" onclick="triggerSOS()">
+                  <span class="material-icons-round">sos</span>
+                  Kumar İsteği Geldi — SOS Gönder
+                </button>
+                <div class="sos-caption">
+                  Butona bastığında yakınınız anlık bildirim alır.<br>
+                  Backend API'ye gerçek istek gönderilir.
+                </div>
+
+                <div class="sos-history">
+                  <div class="buddy-section-title" style="margin-bottom:10px">Son Bildirimler</div>
+                  <div id="sosHistory">
+                    <div style="font-size:12px;color:rgba(255,255,255,0.2);padding:8px 0">Henüz bildirim gönderilmedi.</div>
+                  </div>
+                </div>
+
+                <div class="gap-lg"></div>
+              </div>
+
+              <div class="bottom-nav">
+                <button class="bnav-item" onclick="navigate('s-dashboard',true)">
+                  <span class="material-icons-round">security</span>
+                  <span class="lbl">VPN</span>
+                </button>
+                <button class="bnav-item" onclick="navigate('s-setup',false)">
+                  <span class="material-icons-round">build_circle</span>
+                  <span class="lbl">Kurulum</span>
+                </button>
+                <button class="bnav-item active" onclick="navigate('s-buddy',false)">
+                  <span class="material-icons-round">sos</span>
+                  <span class="lbl">SOS</span>
+                </button>
+              </div>
+            </div>
+
+          </div><!-- /screens -->
+
+          <!-- SOS Overlay -->
+          <div class="sos-overlay" id="sosOverlay">
+            <div class="sos-popup-card">
+              <div class="material-icons-round sos-popup-icon">warning</div>
+              <div class="sos-popup-title">Acil Durum Aktif</div>
+              <div class="sos-popup-msg" id="sosMsg">
+                ⚠️ <strong id="popupBuddyName">Ahmet Abi</strong>'ye acil durum bildirimi gönderiliyor...
+              </div>
+              <div class="sos-popup-sent" id="sosSent">✅ Bildirim Gönderildi!</div>
+            </div>
+          </div>
+
+        </div><!-- /phone-shell -->
+      </div><!-- /phone-wrap -->
+
+      <!-- Right info panel -->
+      <div class="info-panel">
+        <div class="info-card">
+          <h3>Canlı API Durumu</h3>
+          <div class="info-row">
+            <span class="key">Backend</span>
+            <span class="val" id="infoBackend">—</span>
+          </div>
+          <div class="info-row">
+            <span class="key">Toplam Domain</span>
+            <span class="val teal" id="infoTotal">—</span>
+          </div>
+          <div class="info-row">
+            <span class="key">Engellenen</span>
+            <span class="val red" id="infoBlocked">—</span>
+          </div>
+          <div class="info-row">
+            <span class="key">VPN Durumu</span>
+            <span class="val" id="infoVpn">Kapalı</span>
+          </div>
+          <div class="info-row">
+            <span class="key">Aktif Ekran</span>
+            <span class="val" id="infoScreen">Dashboard</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <h3>Simülatör Logu</h3>
+          <div class="log-box" id="logBox">
+            <span class="log-line info">[sim] Başlatılıyor...</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <h3>Ekran Geçişleri</h3>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button onclick="jumpTo('s-splash')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.6);font-size:12px;padding:7px 12px;cursor:pointer;font-family:Inter,sans-serif;text-align:left">
+              → Splash
+            </button>
+            <button onclick="jumpTo('s-login')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.6);font-size:12px;padding:7px 12px;cursor:pointer;font-family:Inter,sans-serif;text-align:left">
+              → Login
+            </button>
+            <button onclick="jumpTo('s-dashboard')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.6);font-size:12px;padding:7px 12px;cursor:pointer;font-family:Inter,sans-serif;text-align:left">
+              → Dashboard
+            </button>
+            <button onclick="jumpTo('s-setup')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.6);font-size:12px;padding:7px 12px;cursor:pointer;font-family:Inter,sans-serif;text-align:left">
+              → Kalkan Kurulumu
+            </button>
+            <button onclick="jumpTo('s-buddy')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.6);font-size:12px;padding:7px 12px;cursor:pointer;font-family:Inter,sans-serif;text-align:left">
+              → Buddy SOS
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /page -->
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  let vpnRunning   = false;
+  let setupStep    = 1;
+  let domains      = [];
+  let sosCount     = 0;
+
+  // ── Clock ──────────────────────────────────────────────────────────────────
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('statusTime').textContent = `${h}:${m}`;
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+
+  // ── Logging ────────────────────────────────────────────────────────────────
+  function addLog(msg, type = '') {
+    const box = document.getElementById('logBox');
+    const line = document.createElement('span');
+    line.className = 'log-line' + (type ? ' ' + type : '');
+    line.textContent = `[${new Date().toLocaleTimeString('tr')}] ${msg}`;
+    box.appendChild(document.createElement('br'));
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // ── Navigation ─────────────────────────────────────────────────────────────
+  function navigate(nextId, isBack) {
+    const curr = document.querySelector('.screen.active');
+    const next = document.getElementById(nextId);
+    if (!next || curr === next) return;
+
+    const enterFrom = isBack ? '-40px' : '40px';
+    const exitTo    = isBack ? '40px'  : '-40px';
+    const DUR = '0.28s';
+
+    next.style.cssText = `transition:none; transform:translateX(${enterFrom}); opacity:0; pointer-events:none;`;
+    next.classList.add('active');
+    void next.offsetWidth;
+
+    const tx = `transition:transform ${DUR} ease,opacity ${DUR} ease;`;
+    next.style.cssText = `${tx} transform:translateX(0); opacity:1; pointer-events:all;`;
+    curr.style.cssText = `${tx} transform:translateX(${exitTo}); opacity:0; pointer-events:none;`;
+
+    setTimeout(() => {
+      curr.classList.remove('active');
+      curr.style.cssText = '';
+      next.style.cssText = '';
+    }, 300);
+
+    const names = {
+      's-splash':'Splash','s-login':'Login','s-dashboard':'Dashboard',
+      's-setup':'Kalkan Kurulumu','s-buddy':'Buddy SOS'
+    };
+    document.getElementById('infoScreen').textContent = names[nextId] || nextId;
+    addLog(`Ekran: ${names[nextId] || nextId}`);
+
+    // sync sidebar
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const map = {
+      's-dashboard': 'nb-dashboard',
+      's-setup': 'nb-setup',
+      's-buddy': 'nb-buddy',
+    };
+    if (map[nextId]) document.getElementById(map[nextId])?.classList.add('active');
+  }
+
+  function jumpTo(id) {
+    const curr = document.querySelector('.screen.active');
+    const next = document.getElementById(id);
+    if (!next || curr === next) return;
+
+    curr.classList.remove('active');
+    curr.style.cssText = '';
+    next.classList.add('active');
+
+    const names = {
+      's-splash':'Splash','s-login':'Login','s-dashboard':'Dashboard',
+      's-setup':'Kalkan Kurulumu','s-buddy':'Buddy SOS'
+    };
+    document.getElementById('infoScreen').textContent = names[id] || id;
+
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const map = { 's-dashboard':'nb-dashboard','s-setup':'nb-setup','s-buddy':'nb-buddy' };
+    if (map[id]) document.getElementById(map[id])?.classList.add('active');
+
+    if (id === 's-splash') {
+      setTimeout(() => navigate('s-login', false), 2500);
+    }
+  }
+
+  // ── API Calls ──────────────────────────────────────────────────────────────
+  async function testApi() {
+    const dot   = document.getElementById('apiDot');
+    const label = document.getElementById('apiLabel');
+    dot.className = 'dot';
+    label.textContent = 'Kontrol...';
+    try {
+      const r = await fetch('/api/health');
+      const d = await r.json();
+      if (d.success) {
+        dot.className = 'dot online';
+        label.textContent = 'Backend Çevrimiçi';
+        document.getElementById('infoBackend').textContent = '✓ Bağlı';
+        document.getElementById('infoBackend').className = 'val green';
+        addLog('API sağlık testi başarılı', 'ok');
+      } else { throw new Error('not ok'); }
+    } catch {
+      dot.className = 'dot offline';
+      label.textContent = 'Backend Çevrimdışı';
+      document.getElementById('infoBackend').textContent = '✗ Bağlanamadı';
+      document.getElementById('infoBackend').className = 'val red';
+      addLog('API sağlık testi başarısız', 'err');
+    }
+  }
+
+  async function loadDomains() {
+    addLog('Domainler yükleniyor...', 'info');
+    try {
+      const r = await fetch('/api/domains');
+      const d = await r.json();
+      if (d.success) {
+        domains = d.data || [];
+        renderMiniList();
+        const blocked = domains.filter(x => x.isBlocked).length;
+        document.getElementById('cardBlocked').textContent  = blocked;
+        document.getElementById('infoTotal').textContent   = domains.length;
+        document.getElementById('infoBlocked').textContent = blocked;
+        document.getElementById('dnsListCount').textContent = domains.length;
+        addLog(`${domains.length} domain yüklendi (${blocked} engellendi)`, 'ok');
+      }
+    } catch (e) {
+      addLog('Domain yükleme hatası: ' + e.message, 'err');
+    }
+  }
+
+  function renderMiniList() {
+    const el = document.getElementById('miniList');
+    if (!domains.length) {
+      el.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(255,255,255,0.2);font-size:12px">Domain bulunamadı</div>';
+      return;
+    }
+    const slice = domains.slice(0, 8);
+    el.innerHTML = slice.map(d => `
+      <div class="mini-row">
+        <span class="dom">${d.domain}</span>
+        <span class="pill-sm ${d.isBlocked ? '' : 'ok'}">${d.isBlocked ? 'Engel' : 'OK'}</span>
+      </div>
+    `).join('');
+  }
+
+  // ── VPN Toggle ─────────────────────────────────────────────────────────────
+  function toggleVpn() {
+    const btn    = document.getElementById('vpnToggleBtn');
+    const ring   = document.getElementById('shieldRing');
+    const status = document.getElementById('vpnStatus');
+    const cardSt = document.getElementById('cardVpnState');
+    const infoVpn= document.getElementById('infoVpn');
+
+    btn.innerHTML = '<div class="spin-sm"></div>';
+    btn.disabled  = true;
+
+    setTimeout(() => {
+      vpnRunning   = !vpnRunning;
+      btn.disabled = false;
+
+      if (vpnRunning) {
+        ring.className  = 'shield-ring on';
+        status.className = 'vpn-status on';
+        status.textContent = `VPN Aktif — ${domains.filter(d=>d.isBlocked).length} domain engelleniyor`;
+        btn.className   = 'dash-toggle-btn stop';
+        btn.innerHTML   = '<span class="material-icons-round">power_settings_new</span> VPN\'yi Durdur';
+        cardSt.textContent = 'Aktif';
+        infoVpn.textContent = 'Aktif';
+        infoVpn.className   = 'val green';
+        addLog('VPN başlatıldı', 'ok');
+      } else {
+        ring.className  = 'shield-ring off';
+        status.className = 'vpn-status off';
+        status.textContent = 'VPN Kapalı — Koruma devre dışı';
+        btn.className   = 'dash-toggle-btn start';
+        btn.innerHTML   = '<span class="material-icons-round">power_settings_new</span> VPN\'yi Başlat';
+        cardSt.textContent = 'Pasif';
+        infoVpn.textContent = 'Kapalı';
+        infoVpn.className   = 'val red';
+        addLog('VPN durduruldu', 'warn');
+      }
+    }, 900);
+  }
+
+  // ── Login ──────────────────────────────────────────────────────────────────
+  function doLogin() {
+    const btn = document.getElementById('loginBtn');
+    btn.innerHTML = '<div class="spin-sm"></div>';
+    btn.disabled  = true;
+    addLog('Giriş yapılıyor...', 'info');
+    setTimeout(() => {
+      btn.innerHTML = '<span class="material-icons-round">login</span> Giriş Yap';
+      btn.disabled  = false;
+      addLog('Giriş başarılı', 'ok');
+      navigate('s-dashboard', false);
+      loadDomains();
+    }, 1200);
+  }
+
+  // ── Setup Wizard ───────────────────────────────────────────────────────────
+  function nextSetupStep() {
+    if (setupStep >= 3) {
+      navigate('s-dashboard', false);
+      return;
+    }
+
+    document.getElementById(`step${setupStep}`).classList.remove('active');
+    setupStep++;
+    document.getElementById(`step${setupStep}`).classList.add('active');
+
+    const bars = ['bar1','bar2','bar3'];
+    bars.forEach((b, i) => {
+      const el = document.getElementById(b);
+      if (i < setupStep - 1) el.className = 'step-bar done';
+      else if (i === setupStep - 1) el.className = 'step-bar current';
+      else el.className = 'step-bar';
+    });
+
+    document.getElementById('setupStepLabel').textContent = `Adım ${setupStep} / 3`;
+
+    if (setupStep === 2) {
+      // Simulate device registration check completing
+      setTimeout(() => {
+        const check = document.getElementById('vpnDevCheck');
+        if (check) check.classList.remove('hidden');
+      }, 1500);
+    }
+
+    if (setupStep === 3) {
+      document.getElementById('setupBtnText').textContent = 'Dashboard\'a Git';
+      document.getElementById('setupBtnIcon').textContent = 'home';
+    }
+
+    addLog(`Kurulum adım ${setupStep}/${3}`, 'info');
+  }
+
+  // ── Buddy / SOS ────────────────────────────────────────────────────────────
+  function updateBuddyDisplay() {
+    const name  = document.getElementById('buddyName').value  || 'Yakın';
+    const phone = document.getElementById('buddyPhone').value || '—';
+    document.getElementById('buddyDisplayName').textContent  = name;
+    document.getElementById('buddyDisplayPhone').textContent = phone;
+    document.getElementById('popupBuddyName').textContent    = name;
+  }
+
+  async function triggerSOS() {
+    const buddyName  = document.getElementById('buddyName').value  || 'Yakın';
+    const buddyPhone = document.getElementById('buddyPhone').value || 'Bilinmiyor';
+
+    const overlay = document.getElementById('sosOverlay');
+    const msgEl   = document.getElementById('sosMsg');
+    const sentEl  = document.getElementById('sosSent');
+
+    document.getElementById('popupBuddyName').textContent = buddyName;
+    msgEl.style.display  = 'block';
+    sentEl.style.display = 'none';
+    overlay.classList.add('show');
+    addLog(`SOS tetiklendi → ${buddyName} (${buddyPhone})`, 'warn');
+
+    try {
+      const r = await fetch('/api/buddy/alert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userName: 'Kullanıcı', buddyName, buddyPhone })
+      });
+      const d = await r.json();
+      if (d.success) {
+        addLog('Buddy alert API başarılı', 'ok');
+      } else {
+        addLog('Buddy alert API hatası: ' + (d.error || '?'), 'err');
+      }
+    } catch (e) {
+      addLog('Buddy alert istek hatası: ' + e.message, 'err');
+    }
+
+    setTimeout(() => {
+      msgEl.style.display  = 'none';
+      sentEl.style.display = 'block';
+
+      // Add to history
+      sosCount++;
+      const hist = document.getElementById('sosHistory');
+      const row  = document.createElement('div');
+      row.className = 'history-row';
+      const now  = new Date().toLocaleTimeString('tr');
+      row.innerHTML = `
+        <div class="hist-dot"></div>
+        <div class="hist-text">SOS #${sosCount} → ${buddyName}</div>
+        <div class="hist-time">${now}</div>
+      `;
+      if (hist.querySelector('div[style]')) hist.innerHTML = '';
+      hist.prepend(row);
+
+      setTimeout(() => overlay.classList.remove('show'), 1500);
+    }, 3000);
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  (async function init() {
+    await testApi();
+    await loadDomains();
+
+    // Splash auto-advance
+    const splash = document.getElementById('s-splash');
+    if (splash.classList.contains('active')) {
+      setTimeout(() => navigate('s-login', false), 2500);
+    }
+
+    addLog('Simülatör hazır', 'ok');
+  })();
+</script>
+</body>
+</html>
