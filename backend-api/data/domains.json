@@ -145,5 +145,33 @@
     "category": "gambling",
     "isBlocked": true,
     "createdAt": "2026-05-18T13:34:10.661Z"
+  },
+  {
+    "id": 23,
+    "domain": "yeni-bahis99.com",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:35:10.674Z"
+  },
+  {
+    "id": 24,
+    "domain": "bahis-tahmin.com",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:36:10.685Z"
+  },
+  {
+    "id": 25,
+    "domain": "rulet-oyna.net",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:37:10.694Z"
+  },
+  {
+    "id": 26,
+    "domain": "betking-tr.com",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:37:10.694Z"
   }
 ]
