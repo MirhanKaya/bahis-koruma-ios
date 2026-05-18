@@ -96,5 +96,33 @@
     "category": "gambling",
     "isBlocked": true,
     "createdAt": "2026-04-13T11:50:08.771Z"
+  },
+  {
+    "id": 16,
+    "domain": "superbetting.io",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:32:10.630Z"
+  },
+  {
+    "id": 17,
+    "domain": "bahismax.io",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:32:10.630Z"
+  },
+  {
+    "id": 18,
+    "domain": "slotworld.com.tr",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:32:10.630Z"
+  },
+  {
+    "id": 19,
+    "domain": "casinomega.net",
+    "category": "gambling",
+    "isBlocked": true,
+    "createdAt": "2026-05-18T13:32:10.630Z"
   }
 ]
