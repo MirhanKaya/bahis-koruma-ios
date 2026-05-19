@@ -1,0 +1,27 @@
+Mevcut siber güvenlik temalı admin panelimizin (index.html) ve backend sunucumuzun (server.js / app.js) tıkır tıkır çalışan JavaScript kodlarını, haritasını ve radarını ASLA bozmadan, sisteme ticari abonelik ve finans yönetim modüllerini eklemeni istiyorum.
+
+Lütfen şu geliştirmeleri cerrahi bir hassasiyetle uygula:
+
+1. BACKEND GELİŞTİRMELERİ:
+- Hafızada (in-memory) simüle edilmiş bir finans ve abonelik veri yapısı oluştur.
+- En az 5-10 örnek kullanıcılı abonelik listesi olsun (Kullanıcı adı, Cihaz, Kalan Süre, Durum: "Aktif" veya "Süresi Doldu / Durduruldu", Kullandığı Referans Kodu).
+- '/api/finance' endpoint'ini oluştur: Günlük/Aylık ciro verileri, toplam aktif abone sayısı ve bekleyen 2-3 adet "Geri İade Talebi" döndürsün.
+- '/api/subscriptions/toggle-status' endpoint'ini oluştur: Gelen kullanıcı ID'sine göre üyelik durumunu "Aktif"ten "Durduruldu"ya veya tam tersine çevirsin (Asla veritabanından silmesin, sadece durdursun).
+
+2. ADMIN PANEL SOL MENÜ (SIDEBAR) GÜNCELLEMESİ:
+Sol menüdeki mevcut sekmeleri koruyarak listeyi tam bir ticari SaaS paneline dönüştür:
+- 📊 Dashboard
+- 🌐 Engellenen Siteler
+- 👥 Abonelik Yönetimi (YENİ)
+- 💰 Finans & İadeler (YENİ)
+- 🌍 Coğrafi Analiz
+- 📱 Mobil Simülatör (Dış link)
+
+3. TAB SYSTEM - YENİ SEKMELERİN İÇERİĞİ:
+- "Abonelik Yönetimi" Sekmesi Aktifken: Şık bir müşteri abonelik tablosu açılın. Tabloda Kullanıcı Adı, Kalan Süre (Örn: "14 Gün", "Süresi Doldu"), Referans Kodu ve Üyelik Durumu (Yeşil "Aktif" / Kırmızı "Durduruldu" rozeti) yer alsın. Her satırın sağında "Üyeliği Durdur/Başlat" butonu olsun ve bu buton backend'deki durdurma API'sine bağlansın.
+- "Finans & İadeler" Sekmesi Aktifken: Üstte bu ayın cirosunu ve toplam kazancı gösteren neon kartlar yer alsın. Altında "Bekleyen İade Talepleri" tablosu olsun (Kullanıcı, İade Nedeni, Tutar). Her talebin yanında yeşil "Onayla" ve kırmızı "Reddet" butonları simüle edilsin.
+
+4. KOD GÜVENLİĞİ VE TASARIM:
+Mevcut çalışan 'Canlı Radar' tablosunu, harita çizim döngülerini ve domain engelleme kodlarını kesinlikle silme, isimlerini değiştirme. Yeni sekmelerin butonlarına basıldığında sayfayı yenilemeden verileri anlık güncelle (DOM manipülasyonu ile). Tasarım dilini mevcut premium dark mode (lacivert, neon cyan ve kırmızı detaylar) ile %100 uyumlu yap.
+
+Bu geliştirmeyi tamamla, yerelde test et ve sorunsuz çalıştığından emin olduktan sonra GitHub reposuna pushla.

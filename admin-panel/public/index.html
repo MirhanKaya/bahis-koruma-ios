@@ -384,6 +384,12 @@
     .radar-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
     .radar-refresh-hint { font-size: 10px; color: rgba(200,214,234,0.25); padding: 8px 16px; text-align: right; }
 
+    /* ── Subscription Badges ─────────────────────────────────────────────── */
+    .sub-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 3px 10px; white-space: nowrap; border: 1px solid transparent; }
+    .sub-active    { background: rgba(0,229,160,0.12); color: var(--green);  border-color: rgba(0,229,160,0.25); }
+    .sub-suspended { background: rgba(255,163,64,0.12); color: var(--orange); border-color: rgba(255,163,64,0.25); }
+    .sub-expired   { background: rgba(255,69,96,0.12);  color: var(--red);   border-color: rgba(255,69,96,0.2); }
+
     /* ── Scrollbar ────────────────────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -411,6 +417,14 @@
     <button class="nav-item" id="nav-domains" onclick="switchTab('domains')">
       <span class="nav-icon">🌐</span>
       <span>Engellenen Siteler</span>
+    </button>
+    <button class="nav-item" id="nav-subscriptions" onclick="switchTab('subscriptions')">
+      <span class="nav-icon">👥</span>
+      <span>Abonelik Yönetimi</span>
+    </button>
+    <button class="nav-item" id="nav-finance" onclick="switchTab('finance')">
+      <span class="nav-icon">💰</span>
+      <span>Finans &amp; İadeler</span>
     </button>
     <button class="nav-item" id="nav-geo" onclick="switchTab('geo')">
       <span class="nav-icon">🌍</span>
@@ -549,6 +563,85 @@
       </div>
 
     </div><!-- /tab-domains -->
+
+    <!-- ── Tab: Abonelik Yönetimi ─────────────────────────────────────── -->
+    <div class="tab-panel" id="tab-subscriptions">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>👥 Müşteri Abonelikleri</h2>
+          <span class="radar-count-badge" id="subCount">— kayıt</span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Kullanıcı</th>
+                <th>Cihaz</th>
+                <th>Plan</th>
+                <th>Kalan Süre</th>
+                <th>Referans Kodu</th>
+                <th>Durum</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="subTable">
+              <tr><td colspan="7" class="loading">Yükleniyor...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tab: Finans & İadeler ────────────────────────────────────────── -->
+    <div class="tab-panel" id="tab-finance">
+      <div class="stats" id="financeCards">
+        <div class="stat-card">
+          <div class="label">Bu Ay Ciro</div>
+          <div class="value" id="finMonthly">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Toplam Kazanç</div>
+          <div class="value" style="color:var(--green)" id="finTotal">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Aktif Abone</div>
+          <div class="value" id="finActive">—</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>📅 Bu Haftanın Günlük Cirosu</h2>
+        </div>
+        <div style="padding:18px 20px 10px">
+          <div id="dailyBars" style="display:flex;gap:8px;align-items:flex-end;height:90px"></div>
+          <div id="dailyLabels" style="display:flex;gap:8px;margin-top:6px"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>⚠️ Bekleyen İade Talepleri</h2>
+          <span class="radar-count-badge" id="refundCount">— talep</span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Kullanıcı</th>
+                <th>İade Nedeni</th>
+                <th>Tutar</th>
+                <th>Tarih</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="refundTable">
+              <tr><td colspan="5" class="loading">Yükleniyor...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
     <!-- ── Tab: Coğrafi Analiz ──────────────────────────────────────────── -->
     <div class="tab-panel" id="tab-geo">
@@ -1119,11 +1212,165 @@
     `).join('');
   }
 
+  // ── Subscriptions ──────────────────────────────────────────────────────
+  async function loadSubscriptions() {
+    try {
+      const r = await fetch('/api/subscriptions');
+      const d = await r.json();
+      if (!d.success) return;
+      renderSubscriptions(d.subscriptions);
+    } catch (e) {
+      console.warn('[subs] Yükleme hatası:', e.message);
+    }
+  }
+
+  function renderSubscriptions(list) {
+    const tbody  = document.getElementById('subTable');
+    const countEl = document.getElementById('subCount');
+    countEl.textContent = `${list.length} kayıt`;
+
+    tbody.innerHTML = list.map(u => {
+      const statusClass = u.status === 'active'    ? 'sub-active'
+                        : u.status === 'suspended' ? 'sub-suspended'
+                        :                            'sub-expired';
+      const statusLabel = u.status === 'active'    ? '✓ Aktif'
+                        : u.status === 'suspended' ? '⏸ Durduruldu'
+                        :                            '✗ Süresi Doldu';
+      const daysLabel = u.daysLeft > 0 ? `${u.daysLeft} Gün` : 'Süresi Doldu';
+      const daysClass = u.daysLeft <= 0 ? 'style="color:var(--red)"'
+                      : u.daysLeft <= 7 ? 'style="color:var(--orange)"'
+                      :                    '';
+      const btnLabel  = u.status === 'active' ? 'Durdur' : 'Başlat';
+      const btnClass  = u.status === 'active' ? 'btn danger sm' : 'btn sm';
+      return `
+        <tr id="sub-row-${u.id}">
+          <td><strong style="color:var(--text)">${escHtml(u.name)}</strong></td>
+          <td style="color:var(--muted);font-size:12px">${escHtml(u.device)}</td>
+          <td><span class="pill unknown">${escHtml(u.plan)}</span></td>
+          <td ${daysClass}><strong>${daysLabel}</strong></td>
+          <td class="uid-cell">${escHtml(u.refCode)}</td>
+          <td><span class="sub-badge ${statusClass}">${statusLabel}</span></td>
+          <td>
+            <button class="${btnClass}" onclick="toggleSubscription('${u.id}')">${btnLabel}</button>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  async function toggleSubscription(userId) {
+    const btn = document.querySelector(`#sub-row-${userId} button`);
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+    try {
+      const r = await fetch('/api/subscriptions/toggle-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const d = await r.json();
+      if (!d.success) throw new Error(d.error);
+      toast(`${escHtml(d.name)}: ${d.newStatus === 'active' ? '✓ Aktif edildi' : '⏸ Durduruldu'}`,
+            d.newStatus === 'active' ? 'success' : 'error');
+      await loadSubscriptions();
+    } catch (e) {
+      toast(`Hata: ${e.message}`, 'error');
+      if (btn) { btn.disabled = false; }
+    }
+  }
+
+  // ── Finance ────────────────────────────────────────────────────────────
+  async function loadFinance() {
+    try {
+      const r = await fetch('/api/finance');
+      const d = await r.json();
+      if (!d.success) return;
+      document.getElementById('finMonthly').textContent = `₺${d.monthlyRevenue.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}`;
+      document.getElementById('finTotal').textContent   = `₺${d.totalRevenue.toLocaleString('tr-TR',   { minimumFractionDigits: 2 })}`;
+      document.getElementById('finActive').textContent  = d.activeSubscribers;
+      renderDailyBars(d.dailyRevenue);
+      renderRefunds(d.pendingRefunds);
+    } catch (e) {
+      console.warn('[finance] Yükleme hatası:', e.message);
+    }
+  }
+
+  function renderDailyBars(days) {
+    const barsEl   = document.getElementById('dailyBars');
+    const labelsEl = document.getElementById('dailyLabels');
+    const max      = Math.max(...days.map(d => d.amount), 1);
+    const barW     = `calc((100% - ${(days.length - 1) * 8}px) / ${days.length})`;
+
+    barsEl.innerHTML = days.map(d => {
+      const pct   = Math.round((d.amount / max) * 100);
+      const color = d.amount > 300 ? 'var(--green)'
+                  : d.amount > 100 ? 'var(--accent)'
+                  : d.amount > 0   ? 'var(--orange)'
+                  :                  'rgba(255,255,255,0.08)';
+      return `<div style="flex:1;background:${color};height:${Math.max(pct,3)}%;border-radius:5px 5px 0 0;transition:height 0.5s ease;position:relative" title="₺${d.amount}"></div>`;
+    }).join('');
+
+    labelsEl.innerHTML = days.map(d =>
+      `<div style="flex:1;text-align:center;font-size:10px;color:var(--muted);font-weight:600">${d.day}</div>`
+    ).join('');
+  }
+
+  function renderRefunds(refunds) {
+    const tbody   = document.getElementById('refundTable');
+    const countEl = document.getElementById('refundCount');
+    const pending = refunds.filter(r => r.status === 'pending');
+    countEl.textContent = `${pending.length} talep`;
+
+    if (!refunds.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">Bekleyen iade talebi yok</td></tr>';
+      return;
+    }
+    tbody.innerHTML = refunds.map(r => {
+      if (r.status !== 'pending') {
+        const label = r.status === 'approved' ? '✓ Onaylandı' : '✗ Reddedildi';
+        const col   = r.status === 'approved' ? 'var(--green)' : 'var(--red)';
+        return `<tr id="refund-row-${r.id}" style="opacity:0.5">
+          <td>${escHtml(r.userName)}</td>
+          <td style="color:var(--muted)">${escHtml(r.reason)}</td>
+          <td style="color:var(--orange);font-weight:700">₺${r.amount.toFixed(2)}</td>
+          <td style="color:var(--muted)">${r.date}</td>
+          <td><span style="color:${col};font-size:12px;font-weight:700">${label}</span></td>
+        </tr>`;
+      }
+      return `<tr id="refund-row-${r.id}">
+        <td><strong style="color:var(--text)">${escHtml(r.userName)}</strong></td>
+        <td style="color:var(--muted)">${escHtml(r.reason)}</td>
+        <td style="color:var(--orange);font-weight:700">₺${r.amount.toFixed(2)}</td>
+        <td style="color:var(--muted)">${r.date}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn sm"        onclick="handleRefund('${r.id}','approve')">✓ Onayla</button>
+          <button class="btn danger sm" onclick="handleRefund('${r.id}','reject')">✗ Reddet</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  async function handleRefund(refundId, action) {
+    const row = document.getElementById(`refund-row-${refundId}`);
+    if (row) row.style.opacity = '0.5';
+    try {
+      const r = await fetch(`/api/finance/refund/${refundId}/${action}`, { method: 'POST' });
+      const d = await r.json();
+      if (!d.success) throw new Error(d.error);
+      toast(action === 'approve' ? '✓ İade onaylandı' : '✗ İade reddedildi',
+            action === 'approve' ? 'success' : 'error');
+      await loadFinance();
+    } catch (e) {
+      toast(`Hata: ${e.message}`, 'error');
+      if (row) row.style.opacity = '1';
+    }
+  }
+
   // ── Tab Navigation ─────────────────────────────────────────────────────
   const TAB_TITLES = {
-    dashboard: 'Dashboard',
-    domains:   'Engellenen Siteler',
-    geo:       'Coğrafi Analiz'
+    dashboard:     'Dashboard',
+    domains:       'Engellenen Siteler',
+    subscriptions: 'Abonelik Yönetimi',
+    finance:       'Finans & İadeler',
+    geo:           'Coğrafi Analiz'
   };
 
   function switchTab(name) {
@@ -1139,6 +1386,8 @@
         else { loadGeoData(); }
       }, 80);
     }
+    if (name === 'subscriptions') loadSubscriptions();
+    if (name === 'finance')       loadFinance();
   }
 
   // ── Keyboard shortcuts ─────────────────────────────────────────────────

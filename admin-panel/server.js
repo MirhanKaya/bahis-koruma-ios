@@ -55,8 +55,13 @@ app.post('/api/classify-domain',(req, res) => proxyRequest(req, res, '/classify-
 app.post('/api/buddy/alert',       (req, res) => proxyRequest(req, res, '/api/buddy/alert',       'POST', req.body));
 app.post('/api/heartbeat',         (req, res) => proxyRequest(req, res, '/api/heartbeat',         'POST', req.body));
 app.get('/api/heartbeat/status',   (req, res) => proxyRequest(req, res, '/api/heartbeat/status'));
-app.get('/api/heartbeat/users',    (req, res) => proxyRequest(req, res, '/api/heartbeat/users'));
-app.get('/api/geo',                (req, res) => proxyRequest(req, res, '/api/geo'));
+app.get('/api/heartbeat/users',             (req, res) => proxyRequest(req, res, '/api/heartbeat/users'));
+app.get('/api/geo',                         (req, res) => proxyRequest(req, res, '/api/geo'));
+app.get('/api/subscriptions',               (req, res) => proxyRequest(req, res, '/api/subscriptions'));
+app.post('/api/subscriptions/toggle-status',(req, res) => proxyRequest(req, res, '/api/subscriptions/toggle-status', 'POST', req.body));
+app.get('/api/finance',                     (req, res) => proxyRequest(req, res, '/api/finance'));
+app.post('/api/finance/refund/:id/approve', (req, res) => proxyRequest(req, res, `/api/finance/refund/${req.params.id}/approve`, 'POST', {}));
+app.post('/api/finance/refund/:id/reject',  (req, res) => proxyRequest(req, res, `/api/finance/refund/${req.params.id}/reject`,  'POST', {}));
 
 // ── Frontend ──────────────────────────────────────────────────────────────────
 app.get('/mobile-preview', (req, res) => {
