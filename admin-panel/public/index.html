@@ -422,6 +422,25 @@
     .sub-active    { background: rgba(0,229,160,0.12); color: var(--green);  border-color: rgba(0,229,160,0.25); }
     .sub-suspended { background: rgba(255,163,64,0.12); color: var(--orange); border-color: rgba(255,163,64,0.25); }
     .sub-expired   { background: rgba(255,69,96,0.12);  color: var(--red);   border-color: rgba(255,69,96,0.2); }
+    .pkg-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:0.4px; border:1px solid; }
+    .pkg-single { background:rgba(200,214,234,0.05); color:rgba(200,214,234,0.4); border-color:rgba(200,214,234,0.1); }
+    .pkg-couple { background:rgba(0,200,255,0.07); color:#00c8ff; border-color:rgba(0,200,255,0.18); }
+    .pkg-family { background:rgba(250,130,49,0.1); color:#fa8231; border-color:rgba(250,130,49,0.22); cursor:pointer; transition:background 0.2s; }
+    .pkg-family:hover { background:rgba(250,130,49,0.18); }
+    .family-accordion { background:rgba(250,130,49,0.03); }
+    .family-accordion td { padding:10px 14px 14px !important; vertical-align:top; }
+    .family-members-grid { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+    .fm-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; font-size:11px; color:rgba(200,214,234,0.7); }
+    .fm-chip .shield-on  { color:#00e5a0; font-size:12px; }
+    .fm-chip .shield-off { color:#ff4560; font-size:12px; }
+    .fm-remove-btn { background:none; border:none; cursor:pointer; color:rgba(255,69,96,0.4); padding:0 0 0 3px; line-height:1; font-size:13px; transition:color 0.15s; font-family:inherit; }
+    .fm-remove-btn:hover { color:#ff4560; }
+    .fm-add-row { display:flex; gap:6px; margin-top:10px; align-items:center; }
+    .fm-add-input { flex:1; min-width:0; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff; font-family:'Inter',sans-serif; font-size:12px; padding:6px 10px; outline:none; transition:border-color 0.2s; }
+    .fm-add-input:focus { border-color:rgba(250,130,49,0.5); }
+    .fm-limit-warn { font-size:11px; color:#ff4560; margin-top:6px; display:none; }
+    .fm-limit-warn.show { display:block; }
+    .fm-count-badge { font-size:10px; color:rgba(250,130,49,0.6); margin-left:6px; }
 
     /* ── Scrollbar ────────────────────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 4px; }
@@ -615,6 +634,7 @@
               <tr>
                 <th>Kullanıcı</th>
                 <th>Cihaz</th>
+                <th>Kullanılan Paket</th>
                 <th>Plan</th>
                 <th>Kalan Süre</th>
                 <th>Referans Kodu</th>
@@ -623,7 +643,7 @@
               </tr>
             </thead>
             <tbody id="subTable">
-              <tr><td colspan="7" class="loading">Yükleniyor...</td></tr>
+              <tr><td colspan="8" class="loading">Yükleniyor...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1287,9 +1307,15 @@
   }
 
   function renderSubscriptions(list) {
-    const tbody  = document.getElementById('subTable');
+    const tbody   = document.getElementById('subTable');
     const countEl = document.getElementById('subCount');
     countEl.textContent = `${list.length} kayıt`;
+
+    const pkgMeta = {
+      single: { label:'👤 Single',   cls:'pkg-single', tip:'' },
+      couple: { label:'👫 Couple',   cls:'pkg-couple', tip:'' },
+      family: { label:'👪 Family',   cls:'pkg-family', tip:'Aile üyelerini görüntülemek için tıklayın' },
+    };
 
     tbody.innerHTML = list.map(u => {
       const statusClass = u.status === 'active'    ? 'sub-active'
@@ -1304,10 +1330,16 @@
                       :                    '';
       const btnLabel  = u.status === 'active' ? 'Durdur' : 'Başlat';
       const btnClass  = u.status === 'active' ? 'btn danger sm' : 'btn sm';
-      return `
+      const pkg       = pkgMeta[u.packageType] || pkgMeta.single;
+      const pkgClick  = u.packageType === 'family'
+        ? `onclick="toggleFamilyAccordion('${u.id}')" title="${pkg.tip}"`
+        : '';
+
+      const mainRow = `
         <tr id="sub-row-${u.id}">
           <td><strong style="color:var(--text)">${escHtml(u.name)}</strong></td>
           <td style="color:var(--muted);font-size:12px">${escHtml(u.device)}</td>
+          <td><span class="pkg-badge ${pkg.cls}" ${pkgClick}>${pkg.label}</span></td>
           <td><span class="pill unknown">${escHtml(u.plan)}</span></td>
           <td ${daysClass}><strong>${daysLabel}</strong></td>
           <td class="uid-cell">${escHtml(u.refCode)}</td>
@@ -1316,7 +1348,106 @@
             <button class="${btnClass}" onclick="toggleSubscription('${u.id}')">${btnLabel}</button>
           </td>
         </tr>`;
+
+      const accordionRow = u.packageType === 'family'
+        ? `<tr class="family-accordion" id="fam-acc-${u.id}" style="display:none">
+             <td colspan="8">
+               <div style="font-size:10px;font-weight:800;color:rgba(250,130,49,0.6);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">
+                 👪 Aile Üyeleri <span class="fm-count-badge" id="fam-count-${u.id}"></span>
+               </div>
+               <div class="family-members-grid" id="fam-list-${u.id}">
+                 <span style="font-size:11px;color:rgba(200,214,234,0.25)">Yükleniyor...</span>
+               </div>
+               <div class="fm-add-row">
+                 <input class="fm-add-input" id="fam-input-${u.id}" placeholder="Yeni üye adı..." maxlength="40"
+                        onkeydown="if(event.key==='Enter') addFamilyMemberAdmin('${u.id}')">
+                 <button class="btn sm" onclick="addFamilyMemberAdmin('${u.id}')">➕ Ekle</button>
+               </div>
+               <div class="fm-limit-warn" id="fam-warn-${u.id}">⚠️ Aile planı sınırına ulaştınız! En fazla 5 kişi ekleyebilirsiniz.</div>
+             </td>
+           </tr>`
+        : '';
+
+      return mainRow + accordionRow;
     }).join('');
+  }
+
+  async function toggleFamilyAccordion(userId) {
+    const row = document.getElementById(`fam-acc-${userId}`);
+    if (!row) return;
+    const isHidden = row.style.display === 'none';
+    row.style.display = isHidden ? 'table-row' : 'none';
+    if (isHidden) await loadFamilyMembersAdmin(userId);
+  }
+
+  async function loadFamilyMembersAdmin(userId) {
+    const listEl  = document.getElementById(`fam-list-${userId}`);
+    const countEl = document.getElementById(`fam-count-${userId}`);
+    const warnEl  = document.getElementById(`fam-warn-${userId}`);
+    if (!listEl) return;
+    try {
+      const r = await fetch(`/api/subscriptions/family/${userId}`);
+      const d = await r.json();
+      if (!d.success) throw new Error(d.error);
+      countEl.textContent = `${d.total} / ${d.maxAllowed} kişi`;
+      warnEl.classList.toggle('show', d.total >= d.maxAllowed);
+      renderFamilyChips(userId, d.members, d.maxAllowed);
+    } catch (e) {
+      listEl.innerHTML = `<span style="color:var(--red);font-size:11px">Hata: ${escHtml(e.message)}</span>`;
+    }
+  }
+
+  function renderFamilyChips(userId, members, maxAllowed) {
+    const listEl = document.getElementById(`fam-list-${userId}`);
+    if (!listEl) return;
+    if (!members.length) {
+      listEl.innerHTML = `<span style="font-size:11px;color:rgba(200,214,234,0.25)">Henüz üye yok.</span>`;
+      return;
+    }
+    listEl.innerHTML = members.map(m => `
+      <span class="fm-chip">
+        <span class="material-icons-round ${m.shieldActive ? 'shield-on' : 'shield-off'}" style="font-size:12px">
+          ${m.shieldActive ? 'shield' : 'shield_off'}
+        </span>
+        ${escHtml(m.name)}
+        <button class="fm-remove-btn" onclick="removeFamilyMemberAdmin('${userId}','${m.id}')" title="Sil">✕</button>
+      </span>`).join('');
+  }
+
+  async function addFamilyMemberAdmin(userId) {
+    const input  = document.getElementById(`fam-input-${userId}`);
+    const warnEl = document.getElementById(`fam-warn-${userId}`);
+    const name   = input?.value?.trim();
+    if (!name) { input?.focus(); return; }
+    try {
+      const r = await fetch('/api/subscriptions/family/add', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ userId, name }),
+      });
+      const d = await r.json();
+      if (!d.success) {
+        if (d.limitReached) warnEl?.classList.add('show');
+        toast(`Hata: ${d.error}`, 'error');
+        return;
+      }
+      input.value = '';
+      warnEl?.classList.toggle('show', d.total >= d.maxAllowed);
+      await loadFamilyMembersAdmin(userId);
+      toast(`✓ "${escHtml(name)}" eklendi`, 'success');
+    } catch (e) { toast(`Hata: ${e.message}`, 'error'); }
+  }
+
+  async function removeFamilyMemberAdmin(userId, memberId) {
+    try {
+      const r = await fetch('/api/subscriptions/family/remove', {
+        method: 'DELETE', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ userId, memberId }),
+      });
+      const d = await r.json();
+      if (!d.success) throw new Error(d.error);
+      await loadFamilyMembersAdmin(userId);
+      toast(`✓ Üye silindi`, 'success');
+    } catch (e) { toast(`Hata: ${e.message}`, 'error'); }
   }
 
   async function toggleSubscription(userId) {

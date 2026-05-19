@@ -826,6 +826,31 @@
     .fade-up { animation: fadeUp 0.35s ease both; }
     .d1 { animation-delay: 0.06s; } .d2 { animation-delay: 0.12s; }
     .d3 { animation-delay: 0.18s; } .d4 { animation-delay: 0.24s; }
+  /* ── Plan Yönetimi ──────────────────────────────────────────────── */
+  .plan-mgmt-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:14px; margin:12px 0 0; }
+  .plan-mgmt-title { font-size:10px; font-weight:800; color:rgba(255,255,255,0.22); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
+  .plan-current-row { display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(250,130,49,0.08); border:1px solid rgba(250,130,49,0.2); border-radius:12px; margin-bottom:10px; }
+  .plan-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#fa8231,#f7b731); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .plan-icon .material-icons-round { font-size:17px; color:#fff; }
+  .plan-name { font-size:13px; font-weight:800; color:#fa8231; }
+  .plan-sub-text { font-size:10px; color:rgba(255,255,255,0.35); }
+  .family-panel { margin-top:2px; }
+  .family-panel-title { font-size:10px; font-weight:700; color:rgba(255,255,255,0.28); display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .family-count { font-size:10px; color:rgba(250,130,49,0.65); font-weight:700; }
+  .family-member-row { display:flex; align-items:center; gap:8px; padding:7px 10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:10px; margin-bottom:5px; }
+  .family-member-icon { width:26px; height:26px; border-radius:8px; background:rgba(0,200,255,0.1); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .family-member-icon .material-icons-round { font-size:13px; color:#00c8ff; }
+  .family-member-name { flex:1; font-size:12px; font-weight:600; color:rgba(255,255,255,0.75); }
+  .family-member-shield { font-size:10px; font-weight:700; }
+  .shield-ok  { color:#00e5a0; }
+  .shield-off { color:#ff4560; }
+  .family-add-row { display:flex; gap:6px; margin-top:8px; }
+  .family-add-input { flex:1; min-width:0; background:rgba(255,255,255,0.05); border:1.5px solid rgba(255,255,255,0.1); border-radius:10px; color:#fff; font-family:'Inter',sans-serif; font-size:13px; padding:9px 11px; outline:none; transition:border-color 0.2s; box-sizing:border-box; }
+  .family-add-input:focus { border-color:rgba(250,130,49,0.5); }
+  .family-add-btn { width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg,#fa8231,#f7b731); border:none; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px; }
+  .family-limit-warn { font-size:11px; color:#ff4560; margin-top:6px; display:none; padding:7px 10px; background:rgba(255,69,96,0.08); border:1px solid rgba(255,69,96,0.2); border-radius:8px; }
+  .family-limit-warn.show { display:block; }
+
   /* ── Onboarding Wizard ───────────────────────────────────────────── */
   #onboardingWizard {
     position: absolute; inset: 0; z-index: 200;
@@ -1274,6 +1299,35 @@
                       <div class="item-icon teal"><span class="material-icons-round">smartphone</span></div>
                       <div class="item-text">Cihaz kaydı tamamlandı</div>
                       <span class="material-icons-round item-check hidden" id="vpnDevCheck">check_circle</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Plan Yönetimi (always visible) -->
+                <div id="planMgmtSection" class="plan-mgmt-card">
+                  <div class="plan-mgmt-title">📦 Plan Yönetimi</div>
+                  <div class="plan-current-row" id="planCurrentRow">
+                    <div class="plan-icon"><span class="material-icons-round">family_restroom</span></div>
+                    <div>
+                      <div class="plan-name" id="planNameLabel">👪 Family Plan</div>
+                      <div class="plan-sub-text" id="planSubText">Maks. 5 cihaz · Aktif</div>
+                    </div>
+                  </div>
+
+                  <!-- Family panel -->
+                  <div class="family-panel" id="familyPanel">
+                    <div class="family-panel-title">
+                      <span>👪 Aile Üyeleri Yönetimi</span>
+                      <span class="family-count" id="simFamCount">0 / 5</span>
+                    </div>
+                    <div id="simFamList"></div>
+                    <div class="family-add-row">
+                      <input class="family-add-input" id="simFamInput" placeholder="Üye adı gir..." maxlength="40"
+                             onkeydown="if(event.key==='Enter') addSimFamilyMember()">
+                      <button class="family-add-btn" onclick="addSimFamilyMember()">＋</button>
+                    </div>
+                    <div class="family-limit-warn" id="simFamWarn">
+                      ⚠️ Aile planı sınırına ulaştınız! En fazla 5 kişi ekleyebilirsiniz.
                     </div>
                   </div>
                 </div>
@@ -2077,7 +2131,95 @@
 
   function resetProfile() {
     localStorage.removeItem('bahiskoruma_profile');
+    localStorage.removeItem('bahiskoruma_simFamMembers');
     location.reload();
+  }
+
+  // ── Plan / Family Management ────────────────────────────────────────────────
+  const SIM_USER_ID    = 'SIM-Kullanici-001';
+  const SIM_FAM_KEY    = 'bahiskoruma_simFamMembers';
+  const MAX_SIM_FAMILY = 5;
+
+  function loadSimPlan() {
+    const members = getSimFamilyMembers();
+    renderSimFamilyPanel(members);
+  }
+
+  function getSimFamilyMembers() {
+    try { return JSON.parse(localStorage.getItem(SIM_FAM_KEY) || 'null') || [
+      { id:'fm-sim-1', name:'Eş',      shieldActive:true  },
+      { id:'fm-sim-2', name:'Çocuk 1', shieldActive:true  },
+      { id:'fm-sim-3', name:'Çocuk 2', shieldActive:false },
+    ]; } catch { return []; }
+  }
+
+  function saveSimFamilyMembers(members) {
+    localStorage.setItem(SIM_FAM_KEY, JSON.stringify(members));
+  }
+
+  function renderSimFamilyPanel(members) {
+    const listEl  = document.getElementById('simFamList');
+    const countEl = document.getElementById('simFamCount');
+    const warnEl  = document.getElementById('simFamWarn');
+    if (!listEl) return;
+    countEl.textContent = `${members.length} / ${MAX_SIM_FAMILY}`;
+    warnEl.classList.toggle('show', members.length >= MAX_SIM_FAMILY);
+
+    if (!members.length) {
+      listEl.innerHTML = `<div style="font-size:11px;color:rgba(255,255,255,0.2);margin-bottom:6px">Henüz üye yok. İlk üyeyi ekleyin.</div>`;
+      return;
+    }
+    listEl.innerHTML = members.map(m => `
+      <div class="family-member-row">
+        <div class="family-member-icon"><span class="material-icons-round">person</span></div>
+        <div class="family-member-name">${escMob(m.name)}</div>
+        <span class="family-member-shield ${m.shieldActive ? 'shield-ok' : 'shield-off'}">
+          ${m.shieldActive ? '🛡️ Aktif' : '⚠️ Pasif'}
+        </span>
+      </div>`).join('');
+  }
+
+  async function addSimFamilyMember() {
+    const input  = document.getElementById('simFamInput');
+    const warnEl = document.getElementById('simFamWarn');
+    const name   = input?.value?.trim();
+    if (!name) { input?.focus(); return; }
+
+    const members = getSimFamilyMembers();
+    if (members.length >= MAX_SIM_FAMILY) {
+      warnEl?.classList.add('show');
+      input.classList.add('shake');
+      input.addEventListener('animationend', () => input.classList.remove('shake'), { once: true });
+      addLog(`⚠️ Aile sınırına ulaşıldı (${MAX_SIM_FAMILY}/${MAX_SIM_FAMILY})`, 'err');
+      return;
+    }
+
+    try {
+      const r = await fetch('/api/subscriptions/family/add', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ userId: SIM_USER_ID, name }),
+      });
+      const d = await r.json();
+      if (!d.success) {
+        if (d.limitReached) {
+          warnEl?.classList.add('show');
+          addLog(`⚠️ ${d.error}`, 'err');
+        }
+        return;
+      }
+      const newMembers = [...members, { id: d.member.id, name: d.member.name, shieldActive: true }];
+      saveSimFamilyMembers(newMembers);
+      input.value = '';
+      warnEl?.classList.toggle('show', d.total >= d.maxAllowed);
+      renderSimFamilyPanel(newMembers);
+      addLog(`👪 "${escMob(name)}" aile üyesi olarak eklendi (${d.total}/${d.maxAllowed})`, 'ok');
+    } catch (e) {
+      addLog(`Aile üyesi eklenemedi: ${e.message}`, 'err');
+    }
+  }
+
+  function escMob(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   // ── Achievements Counter ────────────────────────────────────────────────────
@@ -2608,6 +2750,7 @@
 
     startHeartbeat();
     initOnboarding();
+    loadSimPlan();
     addLog('Simülatör hazır — Anti-tamper aktif', 'ok');
   })();
 </script>
