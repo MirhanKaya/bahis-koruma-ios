@@ -65,6 +65,7 @@ app.post('/api/subscriptions/toggle-status',         (req, res) => proxyRequest(
 app.get('/api/subscriptions/family/:userId',         (req, res) => proxyRequest(req, res, `/api/subscriptions/family/${req.params.userId}`));
 app.post('/api/subscriptions/family/add',            (req, res) => proxyRequest(req, res, '/api/subscriptions/family/add',       'POST',   req.body));
 app.delete('/api/subscriptions/family/remove',       (req, res) => proxyRequest(req, res, '/api/subscriptions/family/remove',    'DELETE', req.body));
+app.post('/api/subscriptions/upgrade',               (req, res) => proxyRequest(req, res, '/api/subscriptions/upgrade',             'POST',   req.body));
 app.get('/api/finance',                     (req, res) => proxyRequest(req, res, '/api/finance'));
 app.post('/api/finance/refund/:id/approve', (req, res) => proxyRequest(req, res, `/api/finance/refund/${req.params.id}/approve`, 'POST', {}));
 app.post('/api/finance/refund/:id/reject',  (req, res) => proxyRequest(req, res, `/api/finance/refund/${req.params.id}/reject`,  'POST', {}));

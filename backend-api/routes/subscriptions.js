@@ -110,4 +110,32 @@ router.delete('/family/remove', (req, res) => {
   res.json({ success: true, removed, total: members.length });
 });
 
+const PLAN_MAX = { single: 1, couple: 2, family: 5 };
+
+router.post('/upgrade', (req, res) => {
+  const { userId, packageType } = req.body || {};
+  if (!userId || !packageType) {
+    return res.status(400).json({ success: false, error: 'userId ve packageType zorunludur' });
+  }
+  const validPlans = Object.keys(PLAN_MAX);
+  if (!validPlans.includes(packageType)) {
+    return res.status(400).json({ success: false, error: `Geçersiz plan: ${packageType}. Geçerli: ${validPlans.join(', ')}` });
+  }
+
+  const maxMembers = PLAN_MAX[packageType];
+
+  if (userId === 'SIM-Kullanici-001') {
+    console.log(`[upgrade] SIM kullanıcısı → ${packageType} (max ${maxMembers} üye)`);
+    return res.json({ success: true, userId, packageType, maxMembers, message: 'Simülatör planı güncellendi' });
+  }
+
+  const user = subscriptions.find(u => u.id === userId);
+  if (!user) return res.status(404).json({ success: false, error: `Kullanıcı bulunamadı: ${userId}` });
+
+  const prevPackage = user.packageType;
+  user.packageType  = packageType;
+  console.log(`[upgrade] ${user.name}: ${prevPackage} → ${packageType} (max ${maxMembers} üye)`);
+  res.json({ success: true, userId, name: user.name, packageType, prevPackage, maxMembers });
+});
+
 module.exports = router;

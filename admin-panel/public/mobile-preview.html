@@ -851,6 +851,26 @@
   .family-limit-warn { font-size:11px; color:#ff4560; margin-top:6px; display:none; padding:7px 10px; background:rgba(255,69,96,0.08); border:1px solid rgba(255,69,96,0.2); border-radius:8px; }
   .family-limit-warn.show { display:block; }
 
+  /* ── Plan Upgrade Center ─────────────────────────────────────────────── */
+  .plan-upgrade-divider { height:1px; background:rgba(255,255,255,0.06); margin:12px 0 10px; }
+  .plan-upgrade-label { font-size:9px; font-weight:800; color:rgba(255,255,255,0.22); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .plan-cards-row { display:flex; gap:7px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+  .plan-cards-row::-webkit-scrollbar { display:none; }
+  .plan-card { flex-shrink:0; width:88px; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.08); border-radius:12px; padding:10px 8px 8px; cursor:pointer; transition:background 0.2s, border-color 0.2s; position:relative; text-align:center; }
+  .plan-card:hover { background:rgba(255,255,255,0.07); }
+  .plan-card.active-plan { background:rgba(0,200,255,0.07); border-color:rgba(0,200,255,0.3); }
+  .plan-card.active-plan .pc-btn { background:rgba(0,229,160,0.12); color:#00e5a0; border-color:rgba(0,229,160,0.3); cursor:default; pointer-events:none; }
+  .pc-popular { position:absolute; top:-7px; left:50%; transform:translateX(-50%); background:linear-gradient(90deg,#fa8231,#f7b731); color:#000; font-size:7px; font-weight:800; border-radius:10px; padding:2px 7px; white-space:nowrap; }
+  .pc-emoji { font-size:18px; margin-bottom:4px; line-height:1; }
+  .pc-name { font-size:11px; font-weight:800; color:#fff; margin-bottom:3px; }
+  .pc-price { font-size:13px; font-weight:800; color:#00c8ff; line-height:1; }
+  .pc-price span { font-size:9px; font-weight:500; color:rgba(255,255,255,0.32); }
+  .pc-desc { font-size:9px; color:rgba(255,255,255,0.26); margin:4px 0 7px; }
+  .pc-btn { width:100%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.55); font-size:9px; font-weight:700; border-radius:8px; padding:5px 4px; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.15s; letter-spacing:0.2px; }
+  .pc-btn:hover { background:rgba(0,200,255,0.12); border-color:rgba(0,200,255,0.3); color:#00c8ff; }
+  .upgrade-toast { margin-top:10px; padding:8px 10px; background:rgba(0,229,160,0.1); border:1px solid rgba(0,229,160,0.25); border-radius:10px; font-size:11px; color:#00e5a0; font-weight:600; text-align:center; display:none; }
+  .upgrade-toast.show { display:block; animation:fadeUp 0.3s ease; }
+
   /* ── Onboarding Wizard ───────────────────────────────────────────── */
   #onboardingWizard {
     position: absolute; inset: 0; z-index: 200;
@@ -1305,14 +1325,43 @@
 
                 <!-- Plan Yönetimi (always visible) -->
                 <div id="planMgmtSection" class="plan-mgmt-card">
-                  <div class="plan-mgmt-title">📦 Plan Yönetimi</div>
+                  <div class="plan-mgmt-title">💳 Abonelik ve Plan Yönetimi</div>
                   <div class="plan-current-row" id="planCurrentRow">
-                    <div class="plan-icon"><span class="material-icons-round">family_restroom</span></div>
+                    <div class="plan-icon"><span class="material-icons-round" id="planIconEl">family_restroom</span></div>
                     <div>
                       <div class="plan-name" id="planNameLabel">👪 Family Plan</div>
                       <div class="plan-sub-text" id="planSubText">Maks. 5 cihaz · Aktif</div>
                     </div>
                   </div>
+
+                  <!-- Plan Upgrade Center -->
+                  <div class="plan-upgrade-divider"></div>
+                  <div class="plan-upgrade-label">Plan Değiştir / Yükselt</div>
+                  <div class="plan-cards-row">
+                    <div class="plan-card" id="planCard-single" onclick="upgradePlan('single')">
+                      <div class="pc-emoji">👤</div>
+                      <div class="pc-name">Single</div>
+                      <div class="pc-price">$9.99<span>/ay</span></div>
+                      <div class="pc-desc">1 cihaz</div>
+                      <button class="pc-btn" id="pcBtn-single">Plana Geç</button>
+                    </div>
+                    <div class="plan-card" id="planCard-couple" onclick="upgradePlan('couple')">
+                      <div class="pc-emoji">👫</div>
+                      <div class="pc-name">Couple</div>
+                      <div class="pc-price">$14.99<span>/ay</span></div>
+                      <div class="pc-desc">2 cihaz</div>
+                      <button class="pc-btn" id="pcBtn-couple">Plana Geç</button>
+                    </div>
+                    <div class="plan-card active-plan" id="planCard-family" onclick="upgradePlan('family')">
+                      <div class="pc-popular">En Popüler</div>
+                      <div class="pc-emoji">👪</div>
+                      <div class="pc-name">Family</div>
+                      <div class="pc-price">$24.99<span>/ay</span></div>
+                      <div class="pc-desc">5 cihaza kadar</div>
+                      <button class="pc-btn" id="pcBtn-family">Aktif Plan ✓</button>
+                    </div>
+                  </div>
+                  <div id="upgradeToast" class="upgrade-toast">✅ Planınız başarıyla güncellendi!</div>
 
                   <!-- Family panel -->
                   <div class="family-panel" id="familyPanel">
@@ -2138,9 +2187,40 @@
   // ── Plan / Family Management ────────────────────────────────────────────────
   const SIM_USER_ID    = 'SIM-Kullanici-001';
   const SIM_FAM_KEY    = 'bahiskoruma_simFamMembers';
+  const SIM_PLAN_KEY   = 'bahiskoruma_simPlan';
   const MAX_SIM_FAMILY = 5;
 
+  const PLAN_CONFIG = {
+    single: { max:1, icon:'person',          name:'👤 Single Plan',   sub:'1 cihaz · Aktif',         nameLabel:'👤 Single Plan',   iconMat:'person'          },
+    couple: { max:2, icon:'people',           name:'👫 Couple Plan',   sub:'2 cihaz · Aktif',          nameLabel:'👫 Couple Plan',   iconMat:'people'          },
+    family: { max:5, icon:'family_restroom',  name:'👪 Family Plan',   sub:'Maks. 5 cihaz · Aktif',   nameLabel:'👪 Family Plan',   iconMat:'family_restroom' },
+  };
+
+  window._simPlan      = localStorage.getItem(SIM_PLAN_KEY) || 'family';
+  window._simMaxFamily = PLAN_CONFIG[window._simPlan]?.max || 5;
+
   function loadSimPlan() {
+    const plan    = window._simPlan;
+    const cfg     = PLAN_CONFIG[plan] || PLAN_CONFIG.family;
+    window._simMaxFamily = cfg.max;
+
+    const nameEl = document.getElementById('planNameLabel');
+    const subEl  = document.getElementById('planSubText');
+    const iconEl = document.getElementById('planIconEl');
+    if (nameEl) nameEl.textContent = cfg.nameLabel;
+    if (subEl)  subEl.textContent  = cfg.sub;
+    if (iconEl) iconEl.textContent = cfg.iconMat;
+
+    ['single','couple','family'].forEach(p => {
+      const card = document.getElementById(`planCard-${p}`);
+      const btn  = document.getElementById(`pcBtn-${p}`);
+      if (card) card.classList.toggle('active-plan', p === plan);
+      if (btn)  btn.textContent = p === plan ? 'Aktif Plan ✓' : 'Plana Geç';
+    });
+
+    const familyPanel = document.getElementById('familyPanel');
+    if (familyPanel) familyPanel.style.display = plan !== 'single' ? 'block' : 'none';
+
     const members = getSimFamilyMembers();
     renderSimFamilyPanel(members);
   }
@@ -2162,8 +2242,9 @@
     const countEl = document.getElementById('simFamCount');
     const warnEl  = document.getElementById('simFamWarn');
     if (!listEl) return;
-    countEl.textContent = `${members.length} / ${MAX_SIM_FAMILY}`;
-    warnEl.classList.toggle('show', members.length >= MAX_SIM_FAMILY);
+    const limit = window._simMaxFamily || MAX_SIM_FAMILY;
+    countEl.textContent = `${members.length} / ${limit}`;
+    warnEl.classList.toggle('show', members.length >= limit);
 
     if (!members.length) {
       listEl.innerHTML = `<div style="font-size:11px;color:rgba(255,255,255,0.2);margin-bottom:6px">Henüz üye yok. İlk üyeyi ekleyin.</div>`;
@@ -2186,11 +2267,12 @@
     if (!name) { input?.focus(); return; }
 
     const members = getSimFamilyMembers();
-    if (members.length >= MAX_SIM_FAMILY) {
+    const limit   = window._simMaxFamily || MAX_SIM_FAMILY;
+    if (members.length >= limit) {
       warnEl?.classList.add('show');
       input.classList.add('shake');
       input.addEventListener('animationend', () => input.classList.remove('shake'), { once: true });
-      addLog(`⚠️ Aile sınırına ulaşıldı (${MAX_SIM_FAMILY}/${MAX_SIM_FAMILY})`, 'err');
+      addLog(`⚠️ Plan sınırına ulaşıldı (${limit}/${limit}) — üst plana geçin`, 'err');
       return;
     }
 
@@ -2215,6 +2297,59 @@
       addLog(`👪 "${escMob(name)}" aile üyesi olarak eklendi (${d.total}/${d.maxAllowed})`, 'ok');
     } catch (e) {
       addLog(`Aile üyesi eklenemedi: ${e.message}`, 'err');
+    }
+  }
+
+  // ── Plan Upgrade Center ─────────────────────────────────────────────────────
+  async function upgradePlan(newPlan) {
+    if (newPlan === window._simPlan) return;
+    const prevPlan = window._simPlan;
+    const cfg      = PLAN_CONFIG[newPlan];
+    if (!cfg) return;
+
+    try {
+      const r = await fetch('/api/subscriptions/upgrade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: SIM_USER_ID, packageType: newPlan }),
+      });
+      const d = await r.json();
+      if (!d.success) { addLog(`Plan değiştirilemedi: ${d.error}`, 'err'); return; }
+
+      window._simPlan      = newPlan;
+      window._simMaxFamily = d.maxMembers;
+      localStorage.setItem(SIM_PLAN_KEY, newPlan);
+
+      const nameEl = document.getElementById('planNameLabel');
+      const subEl  = document.getElementById('planSubText');
+      const iconEl = document.getElementById('planIconEl');
+      if (nameEl) nameEl.textContent = cfg.nameLabel;
+      if (subEl)  subEl.textContent  = cfg.sub;
+      if (iconEl) iconEl.textContent = cfg.iconMat;
+
+      ['single','couple','family'].forEach(p => {
+        const card = document.getElementById(`planCard-${p}`);
+        const btn  = document.getElementById(`pcBtn-${p}`);
+        if (card) card.classList.toggle('active-plan', p === newPlan);
+        if (btn)  btn.textContent = p === newPlan ? 'Aktif Plan ✓' : 'Plana Geç';
+      });
+
+      const familyPanel = document.getElementById('familyPanel');
+      if (familyPanel) familyPanel.style.display = newPlan !== 'single' ? 'block' : 'none';
+
+      renderSimFamilyPanel(getSimFamilyMembers());
+
+      const toast = document.getElementById('upgradeToast');
+      if (toast) {
+        toast.textContent = `✅ ${cfg.nameLabel} aktif! (maks. ${d.maxMembers} cihaz)`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3500);
+      }
+
+      addLog(`💳 Plan: ${PLAN_CONFIG[prevPlan]?.nameLabel || prevPlan} → ${cfg.nameLabel} (max ${d.maxMembers} cihaz)`, 'ok');
+
+    } catch (e) {
+      addLog(`Plan yükseltme hatası: ${e.message}`, 'err');
     }
   }
 
