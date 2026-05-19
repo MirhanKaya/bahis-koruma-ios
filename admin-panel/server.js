@@ -62,9 +62,11 @@ app.post('/api/subscriptions/toggle-status',(req, res) => proxyRequest(req, res,
 app.get('/api/finance',                     (req, res) => proxyRequest(req, res, '/api/finance'));
 app.post('/api/finance/refund/:id/approve', (req, res) => proxyRequest(req, res, `/api/finance/refund/${req.params.id}/approve`, 'POST', {}));
 app.post('/api/finance/refund/:id/reject',  (req, res) => proxyRequest(req, res, `/api/finance/refund/${req.params.id}/reject`,  'POST', {}));
-app.get('/api/tickets',         (req, res) => proxyRequest(req, res, '/api/tickets'));
-app.post('/api/tickets',        (req, res) => proxyRequest(req, res, '/api/tickets',         'POST', req.body));
-app.post('/api/tickets/resolve',(req, res) => proxyRequest(req, res, '/api/tickets/resolve', 'POST', req.body));
+app.get('/api/tickets',            (req, res) => proxyRequest(req, res, '/api/tickets'));
+app.post('/api/tickets',           (req, res) => proxyRequest(req, res, '/api/tickets',            'POST', req.body));
+app.post('/api/tickets/resolve',   (req, res) => proxyRequest(req, res, '/api/tickets/resolve',    'POST', req.body));
+app.post('/api/ai-chat',           (req, res) => proxyRequest(req, res, '/api/ai-chat',            'POST', req.body));
+app.get('/api/ai-chat/history',    (req, res) => proxyRequest(req, res, '/api/ai-chat/history'));
 
 // ── Frontend ──────────────────────────────────────────────────────────────────
 app.get('/mobile-preview', (req, res) => {

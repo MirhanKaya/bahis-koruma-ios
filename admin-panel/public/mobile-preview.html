@@ -648,6 +648,95 @@
     .sos-popup-msg { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.65; }
     .sos-popup-sent { font-size: 15px; font-weight: 700; color: #2a9d8f; margin-top: 14px; display: none; }
 
+    /* ── Chat UI (mobile) ────────────────────────────────────────────── */
+    .chat-section-title {
+      font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.28);
+      text-transform: uppercase; letter-spacing: 0.8px;
+      display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+    }
+    .chat-section-title .ai-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #2a9d8f; animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.4; transform: scale(0.7); }
+    }
+    .chat-bubbles {
+      display: flex; flex-direction: column; gap: 8px;
+      max-height: 240px; overflow-y: auto;
+      padding: 10px 0; margin-bottom: 10px;
+    }
+    .chat-bubbles::-webkit-scrollbar { display: none; }
+    .chat-bubble {
+      max-width: 85%; padding: 9px 13px; border-radius: 16px;
+      font-size: 12.5px; line-height: 1.55; word-break: break-word;
+      animation: fadeUp 0.22s ease;
+    }
+    .chat-bubble.user {
+      align-self: flex-end;
+      background: rgba(42,157,143,0.18);
+      border: 1px solid rgba(42,157,143,0.3);
+      color: rgba(255,255,255,0.88);
+      border-bottom-right-radius: 4px;
+    }
+    .chat-bubble.bot {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.78);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-bubble.typing {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.35);
+      font-style: italic; font-size: 11px;
+    }
+    .chat-input-row {
+      display: flex; gap: 8px; align-items: flex-end;
+    }
+    .chat-input-row textarea {
+      flex: 1; background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.09); border-radius: 13px;
+      padding: 10px 12px; font-size: 13px; font-family: 'Inter', sans-serif;
+      color: #fff; outline: none; resize: none; height: 42px; line-height: 1.4;
+      transition: border-color 0.2s; -webkit-appearance: none;
+    }
+    .chat-input-row textarea:focus { border-color: #2a9d8f; }
+    .chat-input-row textarea::placeholder { color: rgba(255,255,255,0.22); }
+    .chat-send-btn {
+      width: 42px; height: 42px; border-radius: 13px; border: none;
+      background: #2a9d8f; color: #fff; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.12s, opacity 0.12s;
+    }
+    .chat-send-btn:active { transform: scale(0.93); }
+    .chat-send-btn .material-icons-round { font-size: 18px; }
+    .chat-send-btn:disabled { opacity: 0.45; cursor: default; }
+
+    /* ── FAQ Accordion (mobile) ───────────────────────────────────────── */
+    .faq-list { display: flex; flex-direction: column; gap: 6px; }
+    .faq-item {
+      border-radius: 12px; border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.03); overflow: hidden;
+    }
+    .faq-q {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px; cursor: pointer;
+      font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,0.75);
+      font-family: 'Inter', sans-serif; border: none; background: none; width: 100%;
+      text-align: left;
+    }
+    .faq-q .material-icons-round { font-size: 16px; color: rgba(255,255,255,0.3); transition: transform 0.22s; }
+    .faq-item.open .faq-q .material-icons-round { transform: rotate(180deg); }
+    .faq-a {
+      display: none; padding: 0 14px 12px;
+      font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.65;
+    }
+    .faq-item.open .faq-a { display: block; animation: fadeUp 0.2s ease; }
+
     /* ── SCREEN 6: Destek & Bildirim ─────────────────────────────────── */
     #s-support { padding-bottom: 0; }
     .support-header {
@@ -1152,36 +1241,86 @@
               </div>
 
               <div class="support-scroll">
-                <div class="gap-md"></div>
+                <!-- ── AI Chat ────────────────────────────────────────── -->
+                <div class="gap-sm"></div>
+                <div class="chat-section-title">
+                  <span class="ai-dot"></span>
+                  💬 AI Koruma Asistanı — Canlı
+                </div>
+                <div class="chat-bubbles" id="chatBubbles">
+                  <div class="chat-bubble bot">
+                    Merhaba! 👋 Ben <strong>Bahis Koruma AI Asistanı</strong>.<br>
+                    VPN sorunun mu var, kalkan hakkında bilgi mi istiyorsun, yoksa sadece konuşmak mı istiyorsun? Her zaman buradayım. 🛡️
+                  </div>
+                </div>
+                <div class="chat-input-row">
+                  <textarea id="chatInput" placeholder="Mesajınızı yazın..." rows="1"
+                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+                  <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">
+                    <span class="material-icons-round">send</span>
+                  </button>
+                </div>
 
-                <div class="buddy-section-title">Talep Türü</div>
+                <div class="gap-md"></div>
+                <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 0 14px"></div>
+
+                <!-- ── SSS / FAQ ──────────────────────────────────────── -->
+                <div class="chat-section-title">❓ Sık Sorulan Sorular</div>
+                <div class="faq-list">
+                  <div class="faq-item" id="faq0">
+                    <button class="faq-q" onclick="toggleFaq(0)">
+                      🛡️ Sabotaj koruması nedir?
+                      <span class="material-icons-round">expand_more</span>
+                    </button>
+                    <div class="faq-a">
+                      Uygulamayı silmeye veya VPN profilini kaldırmaya çalışırsan sistem otomatik alarm verir. Güvenilir yakının (Buddy) anlık bildirim alır ve admin panelinde uyarı oluşur. Bu özellik, zor anlarda seni senin iyiliğin için korur.
+                    </div>
+                  </div>
+                  <div class="faq-item" id="faq1">
+                    <button class="faq-q" onclick="toggleFaq(1)">
+                      🔒 Kalkan nasıl çalışır?
+                      <span class="material-icons-round">expand_more</span>
+                    </button>
+                    <div class="faq-a">
+                      3 katmanlı sistem: (1) DNS Filtresi kumar sitelerini engeller, (2) VPN Tüneli tüm trafiği güvenli sunucudan geçirir, (3) Gerçek zamanlı liste güncellemesi yeni açılan bahis sitelerini otomatik ekler. Sonuç: %99.7 engelleme başarısı.
+                    </div>
+                  </div>
+                  <div class="faq-item" id="faq2">
+                    <button class="faq-q" onclick="toggleFaq(2)">
+                      💙 Kumar isteği geldiğinde ne yapmalıyım?
+                      <span class="material-icons-round">expand_more</span>
+                    </button>
+                    <div class="faq-a">
+                      Hemen "SOS Gönder" butonuna bas — yakının uyarılır. Ya da bu sohbet kutusuna yaz, AI asistan seninle konuşur. İsteği geçirmek için 15 dakika bekle: istatistiksel olarak yoğunluk kendiliğinden düşer. Sen daha güçlüsün.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="gap-md"></div>
+                <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 0 14px"></div>
+
+                <!-- ── Ticket Form ─────────────────────────────────────── -->
+                <div class="chat-section-title">📩 Destek Talebi Oluştur</div>
                 <div class="type-seg" id="typeSeg">
-                  <button id="btnComplaint"  class="sel-complaint"  onclick="selectType('complaint')">⚠️ Şikayet / Teknik</button>
-                  <button id="btnSuggestion"                         onclick="selectType('suggestion')">💡 Öneri / Fikir</button>
+                  <button id="btnComplaint"  class="sel-complaint"  onclick="selectType('complaint')">⚠️ Şikayet</button>
+                  <button id="btnSuggestion"                         onclick="selectType('suggestion')">💡 Öneri</button>
                 </div>
                 <input type="hidden" id="ticketType" value="complaint">
-
                 <div class="gap-sm"></div>
-                <div class="buddy-section-title">Konu Başlığı</div>
-                <input type="text" class="support-input" id="ticketTitle" placeholder="Neyle ilgili?" maxlength="80">
-
+                <input type="text" class="support-input" id="ticketTitle" placeholder="Konu başlığı" maxlength="80">
                 <div class="gap-sm"></div>
-                <div class="buddy-section-title">Mesajınız</div>
-                <textarea class="support-textarea" id="ticketMsg" placeholder="Sorununuzu veya önerinizi buraya yazın..."></textarea>
-
-                <div class="gap-md"></div>
+                <textarea class="support-textarea" id="ticketMsg" placeholder="Detaylı açıklama..."></textarea>
+                <div class="gap-sm"></div>
                 <button class="btn-primary" id="submitTicketBtn" onclick="submitTicket()">
                   <span class="material-icons-round">send</span>
                   <span id="submitBtnTxt">Gönder</span>
                 </button>
-
                 <div class="support-success" id="supportSuccess">
                   <div class="s-icon">
                     <span class="material-icons-round">check_circle</span>
                   </div>
                   <p>Talebiniz admin paneline iletildi.<br>En kısa sürede yanıt alacaksınız.</p>
                 </div>
-
                 <div class="gap-lg"></div>
               </div>
 
@@ -1643,6 +1782,63 @@
     document.getElementById('uninstallBtn').style.display  = 'flex';
     startHeartbeat();
     addLog('📱 Uygulama yeniden yüklendi — heartbeat yeniden başladı', 'ok');
+  }
+
+  // ── AI Chat ────────────────────────────────────────────────────────────────
+  let chatSessionId = `session_sim_${Date.now()}`;
+
+  function addBubble(text, role) {
+    const box    = document.getElementById('chatBubbles');
+    const bubble = document.createElement('div');
+    bubble.className = `chat-bubble ${role}`;
+    bubble.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    box.appendChild(bubble);
+    box.scrollTop = box.scrollHeight;
+    return bubble;
+  }
+
+  async function sendChat() {
+    const ta  = document.getElementById('chatInput');
+    const btn = document.getElementById('chatSendBtn');
+    const msg = (ta?.value || '').trim();
+    if (!msg) return;
+
+    ta.value = '';
+    btn.disabled = true;
+    addBubble(msg, 'user');
+    addLog(`💬 AI mesaj: "${msg.slice(0,40)}"`, 'info');
+
+    const typing = addBubble('● ● ●', 'typing');
+
+    try {
+      const r = await fetch('/api/ai-chat', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          userId:    `sim_${chatSessionId}`,
+          sessionId: chatSessionId,
+          message:   msg,
+        }),
+      });
+      const d = await r.json();
+      typing.remove();
+      if (!d.success) throw new Error(d.error || 'API hatası');
+      addBubble(d.reply, 'bot');
+      addLog('🤖 AI yanıtladı', 'ok');
+    } catch (err) {
+      typing.remove();
+      addBubble('Bağlantı hatası. Lütfen tekrar dene.', 'bot');
+      addLog(`❌ AI hata: ${err.message}`, 'err');
+    } finally {
+      btn.disabled = false;
+      ta.focus();
+    }
+  }
+
+  function toggleFaq(idx) {
+    const item = document.getElementById(`faq${idx}`);
+    if (!item) return;
+    item.classList.toggle('open');
   }
 
   // ── Support / Ticket ───────────────────────────────────────────────────────

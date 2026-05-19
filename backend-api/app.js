@@ -11,6 +11,7 @@ const geoRouter           = require('./routes/geo');
 const subscriptionsRouter = require('./routes/subscriptions');
 const financeRouter       = require('./routes/finance');
 const ticketsRouter       = require('./routes/tickets');
+const aiChatRouter        = require('./routes/ai-chat');
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use('/api/geo',           geoRouter);
 app.use('/api/subscriptions', subscriptionsRouter);
 app.use('/api/finance',       financeRouter);
 app.use('/api/tickets',       ticketsRouter);
+app.use('/api/ai-chat',      aiChatRouter);
 
 // Legacy aliases
 app.use('/api/domains',  requireApiKey, domainsRouter);

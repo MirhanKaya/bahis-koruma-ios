@@ -405,6 +405,18 @@
     .ticket-status-badge.reviewing { background: rgba(0,200,255,0.1);   color: var(--accent); border-color: rgba(0,200,255,0.2); }
     .ticket-status-badge.resolved  { background: rgba(0,229,160,0.1);   color: var(--green);  border-color: rgba(0,229,160,0.2); opacity: 0.7; }
 
+    /* ── Admin AI Chat History ────────────────────────────────────────────── */
+    .chat-history-entry { border-radius: 10px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); margin-bottom: 10px; overflow: hidden; }
+    .chat-history-header { display: flex; align-items: center; gap: 10px; padding: 10px 14px 6px; }
+    .chat-history-uid { font-size: 11px; font-weight: 700; color: var(--accent); }
+    .chat-history-time { font-size: 10px; color: var(--muted); margin-left: auto; }
+    .chat-bubble-admin { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 12px; line-height: 1.6; margin: 3px 14px; word-break: break-word; }
+    .chat-bubble-admin.user { align-self: flex-end; margin-left: auto; background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.15); color: var(--text); border-bottom-right-radius: 3px; }
+    .chat-bubble-admin.bot  { align-self: flex-start; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: var(--muted); border-bottom-left-radius: 3px; }
+    .chat-history-body { display: flex; flex-direction: column; padding-bottom: 12px; }
+    .ai-live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-right: 4px; animation: pulse-admin 1.6s ease-in-out infinite; vertical-align: middle; }
+    @keyframes pulse-admin { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.35;transform:scale(0.65)} }
+
     /* ── Subscription Badges ─────────────────────────────────────────────── */
     .sub-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 3px 10px; white-space: nowrap; border: 1px solid transparent; }
     .sub-active    { background: rgba(0,229,160,0.12); color: var(--green);  border-color: rgba(0,229,160,0.25); }
@@ -675,9 +687,10 @@
           <h2>🎫 Destek & Geri Bildirim Talepleri</h2>
           <span class="radar-count-badge" id="supportCount">— talep</span>
         </div>
-        <div style="display:flex;gap:8px;padding:0 20px 16px">
-          <button class="support-filter-btn active" id="filterComplaint" onclick="filterTickets('complaint')">⚠️ Aktif Şikayetler</button>
+        <div style="display:flex;gap:8px;padding:0 20px 16px;flex-wrap:wrap">
+          <button class="support-filter-btn active" id="filterComplaint"  onclick="filterTickets('complaint')">⚠️ Aktif Şikayetler</button>
           <button class="support-filter-btn"        id="filterSuggestion" onclick="filterTickets('suggestion')">💡 Müşteri Önerileri</button>
+          <button class="support-filter-btn"        id="filterAiChat"     onclick="filterTickets('ai-chat')">💬 Canlı AI Sohbetleri</button>
         </div>
         <div id="ticketList" style="padding:0 12px 16px">
           <div class="loading">Yükleniyor...</div>
@@ -1427,7 +1440,42 @@
     _ticketFilter = type;
     document.getElementById('filterComplaint').classList.toggle('active',  type === 'complaint');
     document.getElementById('filterSuggestion').classList.toggle('active', type === 'suggestion');
+    document.getElementById('filterAiChat').classList.toggle('active',     type === 'ai-chat');
+    if (type === 'ai-chat') { loadChatHistory(); return; }
     renderTickets(type);
+  }
+
+  async function loadChatHistory() {
+    const container = document.getElementById('ticketList');
+    const countEl   = document.getElementById('supportCount');
+    container.innerHTML = '<div class="loading">AI sohbet geçmişi yükleniyor...</div>';
+    try {
+      const r = await fetch('/api/ai-chat/history');
+      const d = await r.json();
+      if (!d.success) throw new Error('API hatası');
+      countEl.textContent = `${d.chats.length} sohbet`;
+      if (!d.chats.length) {
+        container.innerHTML = '<div class="empty" style="padding:28px 0;text-align:center;color:var(--muted)">Henüz AI sohbeti yok</div>';
+        return;
+      }
+      container.innerHTML = d.chats.map(c => `
+        <div class="chat-history-entry">
+          <div class="chat-history-header">
+            <span class="ai-live-dot"></span>
+            <span class="chat-history-uid">${escHtml(c.userId)}</span>
+            <span style="font-size:10px;color:var(--muted);background:rgba(0,200,255,0.08);padding:2px 8px;border-radius:10px;border:1px solid rgba(0,200,255,0.15)">
+              ${escHtml(c.sessionId)}
+            </span>
+            <span class="chat-history-time">${c.date} ${c.time}</span>
+          </div>
+          <div class="chat-history-body">
+            <div class="chat-bubble-admin user">${escHtml(c.userMsg)}</div>
+            <div class="chat-bubble-admin bot">${escHtml(c.botReply).replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
+          </div>
+        </div>`).join('');
+    } catch (e) {
+      container.innerHTML = `<div class="empty" style="color:var(--red);padding:20px;text-align:center">Yükleme hatası: ${e.message}</div>`;
+    }
   }
 
   function renderTickets(type) {
