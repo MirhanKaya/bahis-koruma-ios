@@ -52,7 +52,9 @@ app.get('/api/domains',         (req, res) => proxyRequest(req, res, '/domains')
 app.post('/api/domains',        (req, res) => proxyRequest(req, res, '/domains',          'POST', req.body));
 app.delete('/api/domains/:id',  (req, res) => proxyRequest(req, res, `/domains/${req.params.id}`, 'DELETE'));
 app.post('/api/classify-domain',(req, res) => proxyRequest(req, res, '/classify-domain',  'POST', req.body));
-app.post('/api/buddy/alert',    (req, res) => proxyRequest(req, res, '/api/buddy/alert',  'POST', req.body));
+app.post('/api/buddy/alert',       (req, res) => proxyRequest(req, res, '/api/buddy/alert',       'POST', req.body));
+app.post('/api/heartbeat',         (req, res) => proxyRequest(req, res, '/api/heartbeat',         'POST', req.body));
+app.get('/api/heartbeat/status',   (req, res) => proxyRequest(req, res, '/api/heartbeat/status'));
 
 // ── Frontend ──────────────────────────────────────────────────────────────────
 app.get('/mobile-preview', (req, res) => {

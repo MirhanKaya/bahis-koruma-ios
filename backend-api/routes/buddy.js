@@ -5,15 +5,31 @@ router.post('/', (req, res) => {
   const {
     userName   = 'Kullanıcı',
     buddyName  = 'Arkadaş',
-    buddyPhone = 'Bilinmiyor'
+    buddyPhone = 'Bilinmiyor',
+    type       = 'SOS',
+    message    = null
   } = req.body;
 
-  console.log(
-    `🚨 KRİZ UYARISI: ${userName} koruma kalkanını kapatma talebinde bulundu!` +
-    ` ${buddyName} (${buddyPhone}) kişisine uyarı gönderildi.`
-  );
+  if (type === 'SHUTDOWN_ATTEMPT') {
+    console.log(
+      `🔴 SABOTAJ UYARISI: ${userName} koruma kalkanını KAPATTI!` +
+      ` ${buddyName} (${buddyPhone}) kişisine bildirim gönderildi.`
+    );
+  } else if (type === 'APP_DELETED') {
+    console.log(
+      `🚨 KRİTİK ALARM: Uygulama Silindi veya Cihaz Bağlantısı Koptu!` +
+      ` ${buddyName} (${buddyPhone}) kişisine acil alarm gönderildi.`
+    );
+  } else {
+    console.log(
+      `🚨 KRİZ UYARISI: ${userName} yardım istedi!` +
+      ` ${buddyName} (${buddyPhone}) kişisine uyarı gönderildi.`
+    );
+  }
 
-  res.json({ success: true, message: 'Buddy alert sent', buddyName, buddyPhone });
+  if (message) console.log(`   Mesaj: ${message}`);
+
+  res.json({ success: true, message: 'Buddy alert sent', type, buddyName, buddyPhone });
 });
 
 module.exports = router;

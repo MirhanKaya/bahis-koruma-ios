@@ -1085,6 +1085,27 @@
             </div>
           </div>
 
+          <!-- Shutdown Confirm Overlay -->
+          <div class="sos-overlay" id="shutdownOverlay" style="background:rgba(0,0,0,0.88)">
+            <div class="sos-popup-card" style="border-color:rgba(230,57,70,0.35)">
+              <div class="material-icons-round sos-popup-icon" style="color:#e63946">shield</div>
+              <div class="sos-popup-title">⚠️ DİKKAT!</div>
+              <div class="sos-popup-msg" style="text-align:left">
+                Koruma kalkanını kapatmak üzeresiniz.<br><br>
+                Bu işlem <strong style="color:#fff">Güvenilir Yakınınıza (Buddy)</strong> anında SMS ve uyarı olarak raporlanacaktır.<br><br>
+                Emin misiniz?
+              </div>
+              <div style="display:flex;gap:10px;margin-top:20px">
+                <button onclick="cancelShutdown()" style="flex:1;height:44px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:rgba(255,255,255,0.7);font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer">
+                  Vazgeç
+                </button>
+                <button onclick="confirmShutdown()" style="flex:1;height:44px;background:#e63946;border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:700;font-family:Inter,sans-serif;cursor:pointer">
+                  Evet, Kapat
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div><!-- /phone-shell -->
       </div><!-- /phone-wrap -->
 
@@ -1111,6 +1132,10 @@
           <div class="info-row">
             <span class="key">Aktif Ekran</span>
             <span class="val" id="infoScreen">Dashboard</span>
+          </div>
+          <div class="info-row">
+            <span class="key">Heartbeat</span>
+            <span class="val" id="infoHeartbeat">—</span>
           </div>
         </div>
 
@@ -1140,6 +1165,25 @@
               → Buddy SOS
             </button>
           </div>
+        </div>
+
+        <div class="info-card" style="border-color:rgba(230,57,70,0.18)">
+          <h3 style="color:rgba(230,57,70,0.55)">Sabotaj Simülasyonu</h3>
+          <div style="font-size:11px;color:rgba(255,255,255,0.28);margin-bottom:12px;line-height:1.6">
+            Gerçek uygulama silinmesini test et.<br>Heartbeat 10 sn kesilirse backend alarm verir.
+          </div>
+          <div id="hbStatusRow" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px;margin-bottom:8px">
+            <div id="hbDot" style="width:8px;height:8px;border-radius:50%;background:#444;flex-shrink:0;transition:background 0.3s"></div>
+            <span id="hbLabel" style="font-size:11px;color:rgba(255,255,255,0.35);font-family:Inter,sans-serif">Heartbeat: Bekleniyor</span>
+          </div>
+          <button id="uninstallBtn" onclick="simulateUninstall()" style="width:100%;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.28);border-radius:8px;color:#e63946;font-size:12px;font-weight:700;padding:9px 12px;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:6px">
+            <span class="material-icons-round" style="font-size:16px">delete_forever</span>
+            Uygulamayı Sil (Uninstall)
+          </button>
+          <button id="reinstallBtn" onclick="simulateReinstall()" style="width:100%;background:rgba(42,157,143,0.1);border:1px solid rgba(42,157,143,0.28);border-radius:8px;color:#2a9d8f;font-size:12px;font-weight:700;padding:9px 12px;cursor:pointer;font-family:Inter,sans-serif;align-items:center;gap:6px;justify-content:center;display:none">
+            <span class="material-icons-round" style="font-size:16px">install_mobile</span>
+            Yeniden Yükle
+          </button>
         </div>
       </div>
 
@@ -1302,6 +1346,15 @@
 
   // ── VPN Toggle ─────────────────────────────────────────────────────────────
   function toggleVpn() {
+    if (vpnRunning) {
+      document.getElementById('shutdownOverlay').classList.add('show');
+      addLog('Kapatma talebi — onay bekleniyor', 'warn');
+    } else {
+      startVpn();
+    }
+  }
+
+  function startVpn() {
     const btn    = document.getElementById('vpnToggleBtn');
     const ring   = document.getElementById('shieldRing');
     const status = document.getElementById('vpnStatus');
@@ -1312,31 +1365,136 @@
     btn.disabled  = true;
 
     setTimeout(() => {
-      vpnRunning   = !vpnRunning;
+      vpnRunning   = true;
       btn.disabled = false;
-
-      if (vpnRunning) {
-        ring.className  = 'shield-ring on';
-        status.className = 'vpn-status on';
-        status.textContent = `VPN Aktif — ${domains.filter(d=>d.isBlocked).length} domain engelleniyor`;
-        btn.className   = 'dash-toggle-btn stop';
-        btn.innerHTML   = '<span class="material-icons-round">power_settings_new</span> VPN\'yi Durdur';
-        cardSt.textContent = 'Aktif';
-        infoVpn.textContent = 'Aktif';
-        infoVpn.className   = 'val green';
-        addLog('VPN başlatıldı', 'ok');
-      } else {
-        ring.className  = 'shield-ring off';
-        status.className = 'vpn-status off';
-        status.textContent = 'VPN Kapalı — Koruma devre dışı';
-        btn.className   = 'dash-toggle-btn start';
-        btn.innerHTML   = '<span class="material-icons-round">power_settings_new</span> VPN\'yi Başlat';
-        cardSt.textContent = 'Pasif';
-        infoVpn.textContent = 'Kapalı';
-        infoVpn.className   = 'val red';
-        addLog('VPN durduruldu', 'warn');
-      }
+      ring.className   = 'shield-ring on';
+      status.className = 'vpn-status on';
+      status.textContent = `VPN Aktif — ${domains.filter(d=>d.isBlocked).length} domain engelleniyor`;
+      btn.className  = 'dash-toggle-btn stop';
+      btn.innerHTML  = '<span class="material-icons-round">power_settings_new</span> VPN\'yi Durdur';
+      cardSt.textContent  = 'Aktif';
+      infoVpn.textContent = 'Aktif';
+      infoVpn.className   = 'val green';
+      addLog('VPN başlatıldı', 'ok');
     }, 900);
+  }
+
+  function cancelShutdown() {
+    document.getElementById('shutdownOverlay').classList.remove('show');
+    addLog('Kapatma iptal edildi', 'info');
+  }
+
+  async function confirmShutdown() {
+    document.getElementById('shutdownOverlay').classList.remove('show');
+
+    const btn    = document.getElementById('vpnToggleBtn');
+    const ring   = document.getElementById('shieldRing');
+    const status = document.getElementById('vpnStatus');
+    const cardSt = document.getElementById('cardVpnState');
+    const infoVpn= document.getElementById('infoVpn');
+
+    vpnRunning = false;
+    ring.className   = 'shield-ring off';
+    status.className = 'vpn-status off';
+    status.textContent = 'VPN Kapalı — Koruma devre dışı';
+    btn.className  = 'dash-toggle-btn start';
+    btn.innerHTML  = '<span class="material-icons-round">power_settings_new</span> VPN\'yi Başlat';
+    cardSt.textContent  = 'Pasif';
+    infoVpn.textContent = 'Kapalı';
+    infoVpn.className   = 'val red';
+
+    addLog('⚠️ Buddy\'ye sabotaj/kapatma bildirimi gönderildi!', 'err');
+
+    const buddyName  = document.getElementById('buddyName')?.value  || 'Güvenilir Yakın';
+    const buddyPhone = document.getElementById('buddyPhone')?.value || 'Kayıtlı Numara';
+
+    try {
+      const r = await fetch('/api/buddy/alert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userName: 'Kullanıcı', buddyName, buddyPhone, type: 'SHUTDOWN_ATTEMPT' })
+      });
+      const d = await r.json();
+      if (d.success) addLog('Sabotaj bildirimi backend\'e iletildi', 'err');
+    } catch (e) {
+      addLog('Sabotaj bildirim hatası: ' + e.message, 'err');
+    }
+  }
+
+  // ── Heartbeat ──────────────────────────────────────────────────────────────
+  let heartbeatTimer  = null;
+  let heartbeatActive = false;
+  let appInstalled    = true;
+
+  function startHeartbeat() {
+    if (heartbeatTimer) return;
+    appInstalled    = true;
+    heartbeatActive = true;
+    setHbStatus(true);
+    heartbeatTimer = setInterval(sendHeartbeat, 5000);
+    sendHeartbeat();
+    addLog('Heartbeat başlatıldı (5s aralık)', 'info');
+  }
+
+  function stopHeartbeat() {
+    if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+    heartbeatActive = false;
+    setHbStatus(false);
+  }
+
+  async function sendHeartbeat() {
+    if (!heartbeatActive) return;
+    try {
+      await fetch('/api/heartbeat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deviceId: 'sim-001' })
+      });
+      setHbStatus(true);
+    } catch {}
+  }
+
+  function setHbStatus(active) {
+    const dot    = document.getElementById('hbDot');
+    const label  = document.getElementById('hbLabel');
+    const infoHb = document.getElementById('infoHeartbeat');
+    if (!dot) return;
+    if (active) {
+      dot.style.background = '#4caf50';
+      dot.style.boxShadow  = '0 0 6px rgba(76,175,80,0.5)';
+      label.textContent    = 'Heartbeat: Aktif ✓';
+      label.style.color    = 'rgba(76,175,80,0.8)';
+      if (infoHb) { infoHb.textContent = 'Aktif'; infoHb.className = 'val green'; }
+    } else {
+      dot.style.background = '#e63946';
+      dot.style.boxShadow  = '0 0 6px rgba(230,57,70,0.5)';
+      label.textContent    = 'Heartbeat: KESİLDİ ⚠️';
+      label.style.color    = 'rgba(230,57,70,0.8)';
+      if (infoHb) { infoHb.textContent = 'Kesildi'; infoHb.className = 'val red'; }
+    }
+  }
+
+  function simulateUninstall() {
+    if (!appInstalled) return;
+    appInstalled = false;
+    stopHeartbeat();
+    document.getElementById('uninstallBtn').style.display  = 'none';
+    document.getElementById('reinstallBtn').style.display  = 'flex';
+    addLog('🗑️ UNINSTALL simüle edildi — heartbeat kesiliyor', 'err');
+    addLog('⏳ Backend 10 sn içinde alarm üretecek...', 'warn');
+    setTimeout(() => {
+      if (!heartbeatActive) {
+        addLog('🚨 KRİTİK ALARM: Uygulama Silindi veya Cihaz Bağlantısı Koptu!', 'err');
+      }
+    }, 12000);
+  }
+
+  function simulateReinstall() {
+    appInstalled = true;
+    document.getElementById('reinstallBtn').style.display  = 'none';
+    document.getElementById('uninstallBtn').style.display  = 'flex';
+    startHeartbeat();
+    addLog('📱 Uygulama yeniden yüklendi — heartbeat yeniden başladı', 'ok');
   }
 
   // ── Login ──────────────────────────────────────────────────────────────────
@@ -1463,7 +1621,8 @@
       setTimeout(() => navigate('s-login', false), 2500);
     }
 
-    addLog('Simülatör hazır', 'ok');
+    startHeartbeat();
+    addLog('Simülatör hazır — Anti-tamper aktif', 'ok');
   })();
 </script>
 </body>

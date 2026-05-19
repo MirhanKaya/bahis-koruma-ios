@@ -2,10 +2,11 @@ const express = require('express');
 const cors = require('cors');
 
 const { requireApiKey } = require('./middleware/auth');
-const domainsRouter  = require('./routes/domains');
-const classifyRouter = require('./routes/classify');
-const usersRouter    = require('./routes/users');
-const buddyRouter    = require('./routes/buddy');
+const domainsRouter   = require('./routes/domains');
+const classifyRouter  = require('./routes/classify');
+const usersRouter     = require('./routes/users');
+const buddyRouter     = require('./routes/buddy');
+const heartbeatRouter = require('./routes/heartbeat');
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use('/', usersRouter);
 app.use('/domains',         requireApiKey, domainsRouter);
 app.use('/classify-domain', requireApiKey, classifyRouter);
 app.use('/api/buddy/alert', requireApiKey, buddyRouter);
+app.use('/api/heartbeat',   heartbeatRouter);
 
 // Legacy aliases
 app.use('/api/domains',  requireApiKey, domainsRouter);

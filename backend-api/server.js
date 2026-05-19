@@ -1,7 +1,8 @@
 const app = require('./app');
 const { seedFirestoreFromLocalIfEmpty, isAvailable } = require('./utils/firebase');
 const { readDomains } = require('./utils/storage');
-const { startDomainScanner } = require('./services/domainScanner');
+const { startDomainScanner }    = require('./services/domainScanner');
+const { startHeartbeatMonitor } = require('./services/heartbeatMonitor');
 
 const PORT = process.env.PORT || 8000;
 
@@ -26,4 +27,5 @@ app.listen(PORT, '0.0.0.0', async () => {
   // Start automated domain scanner — runs every 60 seconds.
   // Detects gambling-related newly registered domains and blocks them automatically.
   startDomainScanner(60_000);
+  startHeartbeatMonitor();
 });
