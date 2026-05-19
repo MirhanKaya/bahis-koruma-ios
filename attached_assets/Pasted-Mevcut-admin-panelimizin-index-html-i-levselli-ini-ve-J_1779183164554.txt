@@ -1,0 +1,24 @@
+Mevcut admin panelimizin (index.html) işlevselliğini ve JavaScript kodlarını ASLA bozmadan, arayüzü yatırımcı sunumu kalitesinde modern, jilet gibi bir "Siber Güvenlik Komuta Merkezi (Premium Dark Mode)" düzenine kavuşturmanı istiyorum. 
+
+Lütfen şu kurallara harfiyen uyarak sadece HTML/CSS düzenini ve sekmeleri güncelle:
+
+1. MEVCUT JS FONKSİYONLARINI KORU: 
+Sayfadaki mevcut Leaflet harita çizim kodlarını, otomatik radar fetch döngüsünü (4 saniyede bir çalışan), sayaç güncellemelerini ve backend API bağlantılarını kesinlikle silme, isimlerini değiştirme. Sadece bu verilerin içine basıldığı HTML elementlerinin yerini ve CSS sınıflarını değiştir.
+
+2. SOL SABİT MENÜ (MODERN SIDEBAR):
+Sayfanın en soluna genişliği sabit (örn: 260px), dikey, şık bir navigasyon menüsü ekle. Arka planı koyu, siber güvenlik temasına uygun (Koyu gri/Siyah, neon mavi/yeşil detaylar) olsun. Menüde şu sekmeler yer alsın:
+- 📊 Dashboard (Genel Durum)
+- 🌐 Engellenen Siteler (Domain Listesi)
+- 🌍 Coğrafi Analiz (Canlı Harita)
+- 📱 Mobil Simülatör (Mevcut sayfa yönlendirme linki ikon olarak yer alsın)
+
+3. SEKMELİ YAPI (TAB SYSTEM - SAYFA UZAYIP GİTMESİN):
+Sağ taraftaki ana içerik alanını sol menüden seçilen sekmeye göre gizle/göster (display: none/block mantığıyla veya class ekleyip çıkararak). Böylece sayfa aşağı doğru uzamaz:
+- "Dashboard" Sekmesi Aktifken: Sadece üstteki sayaç kartları (API bağlı pini dahil) ve hemen altında "Canlı Aktif Kullanıcılar Radarı" tablosu gözüksün.
+- "Engellenen Siteler" Sekmesi Aktifken: Sadece otomatik taranan domain listesi tablosu gözüksün. Tablonun üstüne şık bir "Manuel Domain Ekle" inputu ve butonu koy. Tablodaki her satırın yanına da "Engeli Kaldır" (Sil) butonu yerleştir (Mevcut backend API'sine bağla). Tablonun yüksekliğini sınırla ve dikey scroll (overflow-y: auto) ekle ki liste uzayınca sayfa taşmasın.
+- "Coğrafi Analiz" Sekmesi Aktifken: Leaflet.js dünya haritası ve sağındaki en çok kullanan şehir/ülke grafikleri yan yana, geniş ve ferah bir modda tam ekran yer alsın.
+
+4. TASARIM VE KUTU DÜZENİ:
+Yazı fontlarını (örn: Inter veya Roboto), kart kenarlıklarını (smooth border-radius) ve tabloları tamamen premium bir yazılım (SaaS) görüntüsüne kavuştur. Canlı radar tablosundaki o kırmızı sabotaj flaş efektlerini ve yanıp sönen "CANLI" rozetini aynen koru.
+
+Bu cerrahi arayüz operasyonunu mevcut çalışan sistemleri bozmadan tamamla, yerelde test et ve sorunsuz çalıştığından emin olduktan sonra GitHub reposuna pushla.
