@@ -10,6 +10,7 @@ const heartbeatRouter     = require('./routes/heartbeat');
 const geoRouter           = require('./routes/geo');
 const subscriptionsRouter = require('./routes/subscriptions');
 const financeRouter       = require('./routes/finance');
+const ticketsRouter       = require('./routes/tickets');
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/heartbeat',     heartbeatRouter);
 app.use('/api/geo',           geoRouter);
 app.use('/api/subscriptions', subscriptionsRouter);
 app.use('/api/finance',       financeRouter);
+app.use('/api/tickets',       ticketsRouter);
 
 // Legacy aliases
 app.use('/api/domains',  requireApiKey, domainsRouter);

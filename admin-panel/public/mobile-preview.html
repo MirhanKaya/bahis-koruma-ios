@@ -648,6 +648,60 @@
     .sos-popup-msg { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.65; }
     .sos-popup-sent { font-size: 15px; font-weight: 700; color: #2a9d8f; margin-top: 14px; display: none; }
 
+    /* ── SCREEN 6: Destek & Bildirim ─────────────────────────────────── */
+    #s-support { padding-bottom: 0; }
+    .support-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 24px 0; flex-shrink: 0;
+    }
+    .support-header .back-btn {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.06);
+      border: none; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: rgba(255,255,255,0.7); flex-shrink: 0;
+    }
+    .support-header .back-btn .material-icons-round { font-size: 20px; }
+    .support-header h2 { font-size: 16px; font-weight: 700; color: #fff; }
+
+    .support-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 24px 24px; }
+    .support-scroll::-webkit-scrollbar { display: none; }
+
+    .type-seg {
+      display: flex; gap: 6px; margin-bottom: 18px;
+    }
+    .type-seg button {
+      flex: 1; height: 38px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.45);
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .type-seg button.sel-complaint { background: rgba(230,57,70,0.14); color: #e63946; border-color: rgba(230,57,70,0.38); }
+    .type-seg button.sel-suggestion { background: rgba(42,157,143,0.14); color: #2a9d8f; border-color: rgba(42,157,143,0.38); }
+
+    .support-input, .support-textarea {
+      width: 100%; background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.09); border-radius: 13px;
+      padding: 13px 14px; font-size: 14px; font-family: 'Inter', sans-serif;
+      color: #fff; outline: none; transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .support-input:focus, .support-textarea:focus { border-color: #2a9d8f; }
+    .support-input::placeholder, .support-textarea::placeholder { color: rgba(255,255,255,0.22); }
+    .support-textarea { height: 110px; resize: none; line-height: 1.55; }
+
+    .support-success {
+      display: none; text-align: center; padding: 14px 0 6px;
+    }
+    .support-success .s-icon {
+      width: 52px; height: 52px; border-radius: 16px;
+      background: rgba(42,157,143,0.12);
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-bottom: 10px;
+    }
+    .support-success .s-icon .material-icons-round { font-size: 28px; color: #2a9d8f; }
+    .support-success p { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
     /* ── Animations ───────────────────────────────────────────────────── */
     @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
     .fade-up { animation: fadeUp 0.35s ease both; }
@@ -683,6 +737,9 @@
     </button>
     <button class="nav-btn" id="nb-buddy" onclick="jumpTo('s-buddy')">
       <span class="material-icons-round">sos</span> Buddy SOS
+    </button>
+    <button class="nav-btn" id="nb-support" onclick="jumpTo('s-support')">
+      <span class="material-icons-round">support_agent</span> Destek &amp; Bildirim
     </button>
 
     <div class="sidebar-section-title" style="margin-top:8px">Aksiyon</div>
@@ -858,6 +915,10 @@
                   <span class="material-icons-round">sos</span>
                   <span class="lbl">SOS</span>
                 </button>
+                <button class="bnav-item" onclick="navigate('s-support',false)">
+                  <span class="material-icons-round">support_agent</span>
+                  <span class="lbl">Destek</span>
+                </button>
               </div>
             </div>
 
@@ -989,6 +1050,10 @@
                   <span class="material-icons-round">sos</span>
                   <span class="lbl">SOS</span>
                 </button>
+                <button class="bnav-item" onclick="navigate('s-support',false)">
+                  <span class="material-icons-round">support_agent</span>
+                  <span class="lbl">Destek</span>
+                </button>
               </div>
             </div>
 
@@ -1067,6 +1132,75 @@
                 <button class="bnav-item active" onclick="navigate('s-buddy',false)">
                   <span class="material-icons-round">sos</span>
                   <span class="lbl">SOS</span>
+                </button>
+                <button class="bnav-item" onclick="navigate('s-support',false)">
+                  <span class="material-icons-round">support_agent</span>
+                  <span class="lbl">Destek</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- SCREEN 6: DESTEK & BİLDİRİM                            -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div id="s-support" class="screen">
+              <div class="support-header">
+                <button class="back-btn" onclick="navigate('s-dashboard',true)">
+                  <span class="material-icons-round">arrow_back_ios</span>
+                </button>
+                <h2>📩 Destek &amp; Bildirim</h2>
+              </div>
+
+              <div class="support-scroll">
+                <div class="gap-md"></div>
+
+                <div class="buddy-section-title">Talep Türü</div>
+                <div class="type-seg" id="typeSeg">
+                  <button id="btnComplaint"  class="sel-complaint"  onclick="selectType('complaint')">⚠️ Şikayet / Teknik</button>
+                  <button id="btnSuggestion"                         onclick="selectType('suggestion')">💡 Öneri / Fikir</button>
+                </div>
+                <input type="hidden" id="ticketType" value="complaint">
+
+                <div class="gap-sm"></div>
+                <div class="buddy-section-title">Konu Başlığı</div>
+                <input type="text" class="support-input" id="ticketTitle" placeholder="Neyle ilgili?" maxlength="80">
+
+                <div class="gap-sm"></div>
+                <div class="buddy-section-title">Mesajınız</div>
+                <textarea class="support-textarea" id="ticketMsg" placeholder="Sorununuzu veya önerinizi buraya yazın..."></textarea>
+
+                <div class="gap-md"></div>
+                <button class="btn-primary" id="submitTicketBtn" onclick="submitTicket()">
+                  <span class="material-icons-round">send</span>
+                  <span id="submitBtnTxt">Gönder</span>
+                </button>
+
+                <div class="support-success" id="supportSuccess">
+                  <div class="s-icon">
+                    <span class="material-icons-round">check_circle</span>
+                  </div>
+                  <p>Talebiniz admin paneline iletildi.<br>En kısa sürede yanıt alacaksınız.</p>
+                </div>
+
+                <div class="gap-lg"></div>
+              </div>
+
+              <div class="bottom-nav">
+                <button class="bnav-item" onclick="navigate('s-dashboard',true)">
+                  <span class="material-icons-round">security</span>
+                  <span class="lbl">VPN</span>
+                </button>
+                <button class="bnav-item" onclick="navigate('s-setup',false)">
+                  <span class="material-icons-round">build_circle</span>
+                  <span class="lbl">Kurulum</span>
+                </button>
+                <button class="bnav-item" onclick="navigate('s-buddy',false)">
+                  <span class="material-icons-round">sos</span>
+                  <span class="lbl">SOS</span>
+                </button>
+                <button class="bnav-item active" onclick="navigate('s-support',false)">
+                  <span class="material-icons-round">support_agent</span>
+                  <span class="lbl">Destek</span>
                 </button>
               </div>
             </div>
@@ -1164,6 +1298,9 @@
             <button onclick="jumpTo('s-buddy')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.6);font-size:12px;padding:7px 12px;cursor:pointer;font-family:Inter,sans-serif;text-align:left">
               → Buddy SOS
             </button>
+            <button onclick="jumpTo('s-support')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.6);font-size:12px;padding:7px 12px;cursor:pointer;font-family:Inter,sans-serif;text-align:left">
+              → Destek &amp; Bildirim
+            </button>
           </div>
         </div>
 
@@ -1197,6 +1334,7 @@
   let setupStep    = 1;
   let domains      = [];
   let sosCount     = 0;
+  let ticketTypeVal = 'complaint';
 
   // ── Clock ──────────────────────────────────────────────────────────────────
   function updateClock() {
@@ -1245,7 +1383,7 @@
 
     const names = {
       's-splash':'Splash','s-login':'Login','s-dashboard':'Dashboard',
-      's-setup':'Kalkan Kurulumu','s-buddy':'Buddy SOS'
+      's-setup':'Kalkan Kurulumu','s-buddy':'Buddy SOS','s-support':'Destek & Bildirim'
     };
     document.getElementById('infoScreen').textContent = names[nextId] || nextId;
     addLog(`Ekran: ${names[nextId] || nextId}`);
@@ -1254,8 +1392,9 @@
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     const map = {
       's-dashboard': 'nb-dashboard',
-      's-setup': 'nb-setup',
-      's-buddy': 'nb-buddy',
+      's-setup':     'nb-setup',
+      's-buddy':     'nb-buddy',
+      's-support':   'nb-support',
     };
     if (map[nextId]) document.getElementById(map[nextId])?.classList.add('active');
   }
@@ -1271,12 +1410,12 @@
 
     const names = {
       's-splash':'Splash','s-login':'Login','s-dashboard':'Dashboard',
-      's-setup':'Kalkan Kurulumu','s-buddy':'Buddy SOS'
+      's-setup':'Kalkan Kurulumu','s-buddy':'Buddy SOS','s-support':'Destek & Bildirim'
     };
     document.getElementById('infoScreen').textContent = names[id] || id;
 
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    const map = { 's-dashboard':'nb-dashboard','s-setup':'nb-setup','s-buddy':'nb-buddy' };
+    const map = { 's-dashboard':'nb-dashboard','s-setup':'nb-setup','s-buddy':'nb-buddy','s-support':'nb-support' };
     if (map[id]) document.getElementById(map[id])?.classList.add('active');
 
     if (id === 's-splash') {
@@ -1504,6 +1643,58 @@
     document.getElementById('uninstallBtn').style.display  = 'flex';
     startHeartbeat();
     addLog('📱 Uygulama yeniden yüklendi — heartbeat yeniden başladı', 'ok');
+  }
+
+  // ── Support / Ticket ───────────────────────────────────────────────────────
+  function selectType(type) {
+    ticketTypeVal = type;
+    document.getElementById('ticketType').value = type;
+    document.getElementById('btnComplaint').className  = type === 'complaint'  ? 'sel-complaint'  : '';
+    document.getElementById('btnSuggestion').className = type === 'suggestion' ? 'sel-suggestion' : '';
+  }
+
+  async function submitTicket() {
+    const title   = (document.getElementById('ticketTitle')?.value || '').trim();
+    const message = (document.getElementById('ticketMsg')?.value   || '').trim();
+    if (!title || !message) {
+      addLog('⚠️ Başlık ve mesaj boş bırakılamaz', 'warn');
+      return;
+    }
+    const btn  = document.getElementById('submitTicketBtn');
+    const txt  = document.getElementById('submitBtnTxt');
+    btn.disabled = true;
+    txt.textContent = 'Gönderiliyor...';
+    addLog(`📩 Destek talebi gönderiliyor: "${title}"`, 'info');
+    try {
+      const resp = await fetch('/api/tickets', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          userId:  `sim_${Date.now()}`,
+          type:    ticketTypeVal,
+          title,
+          message,
+        }),
+      });
+      const data = await resp.json();
+      if (!data.success) throw new Error(data.error || 'API hatası');
+      addLog(`✅ Talep gönderildi! ID: ${data.ticket.id}`, 'ok');
+      document.getElementById('ticketTitle').value = '';
+      document.getElementById('ticketMsg').value   = '';
+      const successEl = document.getElementById('supportSuccess');
+      if (successEl) { successEl.style.display = 'block'; }
+      btn.style.display = 'none';
+      setTimeout(() => {
+        if (successEl) successEl.style.display = 'none';
+        btn.style.display = '';
+        btn.disabled = false;
+        txt.textContent = 'Gönder';
+      }, 3500);
+    } catch (err) {
+      addLog(`❌ Gönderim başarısız: ${err.message}`, 'err');
+      btn.disabled = false;
+      txt.textContent = 'Gönder';
+    }
   }
 
   // ── Login ──────────────────────────────────────────────────────────────────

@@ -384,6 +384,27 @@
     .radar-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
     .radar-refresh-hint { font-size: 10px; color: rgba(200,214,234,0.25); padding: 8px 16px; text-align: right; }
 
+    /* ── Support Filter Buttons & Accordion ──────────────────────────────── */
+    .support-filter-btn { padding: 7px 16px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: rgba(200,214,234,0.5); font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+    .support-filter-btn.active { background: rgba(0,200,255,0.12); color: var(--accent); border-color: rgba(0,200,255,0.3); }
+    .ticket-row { border-radius: 10px; overflow: hidden; margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.025); }
+    .ticket-header { display: flex; align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer; user-select: none; transition: background 0.15s; }
+    .ticket-header:hover { background: rgba(255,255,255,0.04); }
+    .ticket-type-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .ticket-type-dot.complaint  { background: var(--red); box-shadow: 0 0 5px rgba(255,69,96,0.5); }
+    .ticket-type-dot.suggestion { background: var(--green); box-shadow: 0 0 5px rgba(0,229,160,0.4); }
+    .ticket-header-title { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); }
+    .ticket-header-meta  { font-size: 11px; color: var(--muted); white-space: nowrap; }
+    .ticket-header-chevron { font-size: 16px; color: var(--muted); transition: transform 0.25s; }
+    .ticket-row.open .ticket-header-chevron { transform: rotate(90deg); }
+    .ticket-body { display: none; padding: 0 14px 14px; animation: fadeUp 0.2s ease; }
+    .ticket-row.open .ticket-body { display: block; }
+    .ticket-msg { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 12px; background: rgba(0,0,0,0.15); padding: 10px 12px; border-radius: 8px; border-left: 3px solid var(--accent); }
+    .ticket-status-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 3px 10px; border: 1px solid transparent; margin-right: 8px; }
+    .ticket-status-badge.open      { background: rgba(255,163,64,0.12); color: var(--orange); border-color: rgba(255,163,64,0.25); }
+    .ticket-status-badge.reviewing { background: rgba(0,200,255,0.1);   color: var(--accent); border-color: rgba(0,200,255,0.2); }
+    .ticket-status-badge.resolved  { background: rgba(0,229,160,0.1);   color: var(--green);  border-color: rgba(0,229,160,0.2); opacity: 0.7; }
+
     /* ── Subscription Badges ─────────────────────────────────────────────── */
     .sub-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 3px 10px; white-space: nowrap; border: 1px solid transparent; }
     .sub-active    { background: rgba(0,229,160,0.12); color: var(--green);  border-color: rgba(0,229,160,0.25); }
@@ -425,6 +446,10 @@
     <button class="nav-item" id="nav-finance" onclick="switchTab('finance')">
       <span class="nav-icon">💰</span>
       <span>Finans &amp; İadeler</span>
+    </button>
+    <button class="nav-item" id="nav-support" onclick="switchTab('support')">
+      <span class="nav-icon">🎫</span>
+      <span>Destek &amp; Talepler</span>
     </button>
     <button class="nav-item" id="nav-geo" onclick="switchTab('geo')">
       <span class="nav-icon">🌍</span>
@@ -639,6 +664,23 @@
               <tr><td colspan="5" class="loading">Yükleniyor...</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tab: Destek & Talepler ──────────────────────────────────────── -->
+    <div class="tab-panel" id="tab-support">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>🎫 Destek & Geri Bildirim Talepleri</h2>
+          <span class="radar-count-badge" id="supportCount">— talep</span>
+        </div>
+        <div style="display:flex;gap:8px;padding:0 20px 16px">
+          <button class="support-filter-btn active" id="filterComplaint" onclick="filterTickets('complaint')">⚠️ Aktif Şikayetler</button>
+          <button class="support-filter-btn"        id="filterSuggestion" onclick="filterTickets('suggestion')">💡 Müşteri Önerileri</button>
+        </div>
+        <div id="ticketList" style="padding:0 12px 16px">
+          <div class="loading">Yükleniyor...</div>
         </div>
       </div>
     </div>
@@ -1365,11 +1407,97 @@
   }
 
   // ── Tab Navigation ─────────────────────────────────────────────────────
+  // ── Tickets ────────────────────────────────────────────────────────────
+  let _allTickets   = [];
+  let _ticketFilter = 'complaint';
+
+  async function loadTickets() {
+    try {
+      const r = await fetch('/api/tickets');
+      const d = await r.json();
+      if (!d.success) return;
+      _allTickets = d.tickets;
+      renderTickets(_ticketFilter);
+    } catch (e) {
+      console.warn('[tickets] Yükleme hatası:', e.message);
+    }
+  }
+
+  function filterTickets(type) {
+    _ticketFilter = type;
+    document.getElementById('filterComplaint').classList.toggle('active',  type === 'complaint');
+    document.getElementById('filterSuggestion').classList.toggle('active', type === 'suggestion');
+    renderTickets(type);
+  }
+
+  function renderTickets(type) {
+    const container = document.getElementById('ticketList');
+    const countEl   = document.getElementById('supportCount');
+    const list      = _allTickets.filter(t => t.type === type);
+    countEl.textContent = `${list.length} talep`;
+
+    if (!list.length) {
+      container.innerHTML = `<div class="empty" style="padding:28px 0;text-align:center;color:var(--muted)">Bu kategoride talep yok</div>`;
+      return;
+    }
+
+    container.innerHTML = list.map(t => {
+      const dotCls    = t.type === 'complaint' ? 'complaint' : 'suggestion';
+      const statusLbl = t.status === 'open'      ? '● Açık'
+                      : t.status === 'reviewing' ? '🔍 İnceleniyor'
+                      :                            '✓ Çözüldü';
+      const resolveBtn = t.status !== 'resolved'
+        ? `<button class="btn sm" onclick="resolveTicket('${t.id}')">✓ Çözüldü Olarak İşaretle</button>`
+        : '';
+      return `
+        <div class="ticket-row" id="ticket-${escHtml(t.id)}" onclick="toggleTicket('${t.id}')">
+          <div class="ticket-header">
+            <span class="ticket-type-dot ${dotCls}"></span>
+            <span class="ticket-header-title">${escHtml(t.title)}</span>
+            <span class="ticket-header-meta">${escHtml(t.userId)} · ${t.date}</span>
+            <span class="material-icons ticket-header-chevron">chevron_right</span>
+          </div>
+          <div class="ticket-body" onclick="event.stopPropagation()">
+            <div class="ticket-msg">${escHtml(t.message)}</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span class="ticket-status-badge ${t.status}">${statusLbl}</span>
+              ${resolveBtn}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function toggleTicket(id) {
+    const row = document.getElementById(`ticket-${id}`);
+    if (!row) return;
+    row.classList.toggle('open');
+  }
+
+  async function resolveTicket(ticketId) {
+    try {
+      const r = await fetch('/api/tickets/resolve', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ ticketId }),
+      });
+      const d = await r.json();
+      if (!d.success) throw new Error(d.error);
+      toast('✓ Talep çözüldü olarak işaretlendi', 'success');
+      await loadTickets();
+      const row = document.getElementById(`ticket-${ticketId}`);
+      if (row) row.classList.add('open');
+    } catch (e) {
+      toast(`Hata: ${e.message}`, 'error');
+    }
+  }
+
   const TAB_TITLES = {
     dashboard:     'Dashboard',
     domains:       'Engellenen Siteler',
     subscriptions: 'Abonelik Yönetimi',
     finance:       'Finans & İadeler',
+    support:       'Destek & Talepler',
     geo:           'Coğrafi Analiz'
   };
 
@@ -1388,6 +1516,7 @@
     }
     if (name === 'subscriptions') loadSubscriptions();
     if (name === 'finance')       loadFinance();
+    if (name === 'support')       loadTickets();
   }
 
   // ── Keyboard shortcuts ─────────────────────────────────────────────────

@@ -1,0 +1,27 @@
+Mevcut siber güvenlik projemizin (harita, canlı radar, finans panelleri, domain otomasyonu) çalışan HİÇBİR JavaScript kodunu bozmadan, mobil simülatör ile admin paneli arasında canlı bir "Müşteri Destek & Geri Bildirim Köprüsü" kurmanı istiyorum.
+
+Lütfen şu geliştirmeleri cerrahi bir titizlikle yap:
+
+1. BACKEND GELİŞTİRMELERİ (server.js / app.js):
+- 'GET /api/tickets' ve 'POST /api/tickets' endpoint'lerini oluştur (Hafızada in-memory saklansın).
+- Varsayılan (mock) veriler arasında mutlaka şu örnek bulunsun:
+  * Başlık: "Örnek öneri renk tablosu", Tür: "Öneri", Mesaj: "Admin panelindeki grafiklerin renk uyumu ve buton tasarımları için neon yeşil yerine cyberpunk moru denenebilir.", Durum: "İnceleniyor"
+- 'POST /api/tickets/resolve' endpoint'i gelen ticket ID'sine göre durumu "Çözüldü" yapsın.
+
+2. MOBİL SİMÜLATÖR GÜNCELLEMESİ (mobile-preview.html):
+- Mobil uygulamanın sol menüsüne veya uygun bir yerine "📩 Destek & Bildirim" alanı/butonu ekle.
+- Tıklayınca açılan formda şu alanlar olsun:
+  * Tür Seçimi (Dropdown/Select): "⚠️ Şikayet / Teknik Destek" veya "💡 Öneri / Fikir"
+  * Konu Başlığı (Input)
+  * Mesajınız (Textarea)
+  * "Gönder" Butonu -> Basılınca backend'deki 'POST /api/tickets' endpoint'ine canlı istek atsın ve başarı uyarısı versin.
+
+3. ADMIN PANEL "DESTEK & TALEPLER" SEKME GÜNCELLEMESİ (index.html):
+- Sayfayı temiz tutmak için bu sekmenin içine iki alt filtre butonu koy: "⚠️ Aktif Şikayetler" ve "💡 Müşteri Önerileri". İkisi aynı yerde listelenip karışıklık yaratmasın, hangisine basılırsa o kategori listelensin.
+- Mesaj Listesi Akordeon (Açılır-Kapanır) Yapıda Olmalı: Mesajlar ilk açıldığında çok yer kaplamasın. Sadece "Konu Başlığı - Kullanıcı ID - Tarih" satırı görünsün. 
+- Satırın üzerine tıklandığında (Click), aşağıya doğru şık bir animasyonla mesajın tam metni ve "Çözüldü Olarak İşaretle" butonu açılsın. Tekrar tıklayınca kapansın.
+
+4. GÖRSEL VE KOD KORUMASI:
+Tasarım dilini mevcut premium siber güvenlik karanlık moduyla (%100 uyumlu neon cyan, sarı, kırmızı) entegre et. Mevcut çalışan hiçbir eski JS fonksiyonunu silme veya bozma.
+
+Geliştirmeyi tamamladıktan sonra yerelde test et ve reposuna pushla.
