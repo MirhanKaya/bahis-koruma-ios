@@ -537,10 +537,11 @@
                 <th>Konum</th>
                 <th>Kalkan Durumu</th>
                 <th>Son Görülme</th>
+                <th style="color:#00e5a0">💰 Kurtardığı Para</th>
               </tr>
             </thead>
             <tbody id="radarTableBody">
-              <tr><td colspan="5" class="radar-empty">Bekleniyor — henüz bağlı cihaz yok</td></tr>
+              <tr><td colspan="6" class="radar-empty">Bekleniyor — henüz bağlı cihaz yok</td></tr>
             </tbody>
           </table>
         </div>
@@ -1166,6 +1167,11 @@
         ? `<span class="status-badge offline">● Çevrimdışı</span>`
         : `<span class="status-badge active">✓ Aktif &amp; Korumalı</span>`;
 
+      const money = parseFloat(u.savedMoney || 0);
+      const moneyHtml = money > 0
+        ? `<span style="font-size:13px;font-weight:800;color:#00e5a0;font-family:'Inter',sans-serif">$${money.toFixed(2)}</span>`
+        : `<span style="font-size:11px;color:rgba(200,214,234,0.2)">—</span>`;
+
       return `
         <tr class="${rowClass}">
           <td class="uid-cell">${escHtml(u.userId)}</td>
@@ -1173,6 +1179,7 @@
           <td class="loc-cell">${escHtml(u.location)}</td>
           <td>${badgeHtml}</td>
           <td class="lastseen-cell">${escHtml(u.lastSeenLabel)}</td>
+          <td>${moneyHtml}</td>
         </tr>
       `;
     }).join('');

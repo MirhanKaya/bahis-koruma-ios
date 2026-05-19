@@ -2,7 +2,7 @@ const TIMEOUT_MS = 15000;
 
 const users = new Map();
 
-function recordUser({ userId, device, location, shieldActive, ip }) {
+function recordUser({ userId, device, location, shieldActive, ip, savedMoney, cleanDays }) {
   if (!userId) return;
   const prev       = users.get(userId) || {};
   const prevShield = prev.shieldActive !== undefined ? prev.shieldActive : true;
@@ -15,7 +15,9 @@ function recordUser({ userId, device, location, shieldActive, ip }) {
     shieldActive: shieldActive !== false,
     lastSeen:     Date.now(),
     ip:           ip          || prev.ip       || '—',
-    sabotage:     nowSabotage
+    sabotage:     nowSabotage,
+    savedMoney:   savedMoney  != null ? parseFloat(savedMoney) : (prev.savedMoney || 0),
+    cleanDays:    cleanDays   != null ? parseInt(cleanDays)    : (prev.cleanDays  || 0),
   });
 }
 

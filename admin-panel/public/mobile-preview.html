@@ -826,6 +826,81 @@
     .fade-up { animation: fadeUp 0.35s ease both; }
     .d1 { animation-delay: 0.06s; } .d2 { animation-delay: 0.12s; }
     .d3 { animation-delay: 0.18s; } .d4 { animation-delay: 0.24s; }
+  /* ── Onboarding Wizard ───────────────────────────────────────────── */
+  #onboardingWizard {
+    position: absolute; inset: 0; z-index: 200;
+    background: #07090f;
+    display: none; flex-direction: column; align-items: center;
+    padding: 24px 20px 20px; overflow-y: auto; border-radius: 48px;
+  }
+  #onboardingWizard.active { display: flex; }
+  #onboardingWizard.fade-out { animation: obFadeOut 0.4s ease forwards; }
+  @keyframes obFadeOut { to { opacity: 0; transform: translateY(-16px); } }
+  .ob-logo { width: 54px; height: 54px; border-radius: 15px; background: linear-gradient(135deg,#2a9d8f,#00c8ff); display:flex; align-items:center; justify-content:center; margin-bottom:10px; box-shadow:0 0 22px rgba(0,200,255,0.3); }
+  .ob-logo .material-icons-round { font-size:26px; color:#fff; }
+  .ob-title { font-size:16px; font-weight:800; color:#fff; margin-bottom:3px; text-align:center; }
+  .ob-sub { font-size:11px; color:rgba(255,255,255,0.4); margin-bottom:18px; text-align:center; line-height:1.5; }
+  .ob-steps { display:flex; gap:5px; margin-bottom:22px; }
+  .ob-step-dot { width:26px; height:4px; border-radius:2px; background:rgba(255,255,255,0.08); transition:background 0.3s; }
+  .ob-step-dot.done { background:#2a9d8f; }
+  .ob-step-dot.active { background:#00c8ff; box-shadow:0 0 6px rgba(0,200,255,0.5); }
+  .ob-panel { display:none; width:100%; flex-direction:column; align-items:center; }
+  .ob-panel.active { display:flex; }
+  .ob-icon-wrap { width:46px; height:46px; border-radius:13px; background:rgba(0,200,255,0.1); border:1px solid rgba(0,200,255,0.2); display:flex; align-items:center; justify-content:center; margin-bottom:12px; }
+  .ob-icon-wrap .material-icons-round { font-size:21px; color:#00c8ff; }
+  .ob-q { font-size:14px; font-weight:700; color:#fff; text-align:center; margin-bottom:5px; }
+  .ob-hint { font-size:11px; color:rgba(255,255,255,0.32); text-align:center; margin-bottom:14px; line-height:1.5; }
+  .ob-input { width:100%; background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.1); border-radius:12px; color:#fff; font-size:22px; font-weight:800; font-family:'Inter',sans-serif; padding:14px 16px; outline:none; text-align:center; transition:border-color 0.2s, background 0.2s; box-sizing:border-box; }
+  .ob-input:focus { border-color:#00c8ff; background:rgba(0,200,255,0.07); }
+  .ob-input.shake { animation:obShake 0.35s ease; }
+  @keyframes obShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)} 40%{transform:translateX(7px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+  .ob-next-btn { width:100%; height:46px; border-radius:13px; background:linear-gradient(135deg,#2a9d8f,#00c8ff); border:none; color:#fff; font-size:14px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:18px; transition:opacity 0.18s; }
+  .ob-next-btn:active { opacity:0.8; }
+  .ob-privacy { font-size:10px; color:rgba(255,255,255,0.18); text-align:center; margin-top:10px; }
+
+  /* ── Push Notification Banner ────────────────────────────────────── */
+  #pushNotifBanner {
+    position:absolute; top:52px; left:8px; right:8px; z-index:160;
+    transform:translateY(-120%);
+    transition:transform 0.38s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events:none;
+  }
+  #pushNotifBanner.show { transform:translateY(0); pointer-events:auto; }
+  .push-card { background:rgba(13,16,33,0.97); border:1px solid rgba(0,200,255,0.22); border-radius:14px; padding:9px 11px; display:flex; align-items:flex-start; gap:9px; box-shadow:0 8px 28px rgba(0,0,0,0.6),0 0 14px rgba(0,200,255,0.1); }
+  .push-app-icon { width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,#2a9d8f,#00c8ff); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .push-app-icon .material-icons-round { font-size:14px; color:#fff; }
+  .push-content { flex:1; }
+  .push-app-name { font-size:10px; font-weight:800; color:rgba(0,200,255,0.75); letter-spacing:0.4px; margin-bottom:2px; }
+  .push-body { font-size:11px; color:rgba(255,255,255,0.82); line-height:1.45; }
+
+  /* ── Achievements Screen ─────────────────────────────────────────── */
+  .ach-header { display:flex; align-items:center; gap:10px; padding:14px 16px 10px; border-bottom:1px solid rgba(255,255,255,0.06); flex-shrink:0; }
+  .ach-header-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#f7b731,#fa8231); display:flex; align-items:center; justify-content:center; }
+  .ach-header-icon .material-icons-round { font-size:17px; color:#fff; }
+  .ach-header-title { font-size:14px; font-weight:800; color:#fff; }
+  .ach-header-sub { font-size:10px; color:rgba(255,255,255,0.32); }
+  .ach-scroll { flex:1; overflow-y:auto; padding:12px 14px 28px; }
+  .ach-hero { background:linear-gradient(135deg,rgba(0,200,255,0.07),rgba(0,229,160,0.05)); border:1px solid rgba(0,229,160,0.18); border-radius:18px; padding:18px 14px; margin-bottom:12px; text-align:center; }
+  .ach-hero-label { font-size:10px; font-weight:800; color:rgba(0,229,160,0.65); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+  .ach-hero-amount { font-size:34px; font-weight:900; color:#00e5a0; font-family:'Inter',sans-serif; letter-spacing:-1px; text-shadow:0 0 20px rgba(0,229,160,0.35); line-height:1; }
+  .ach-hero-sub { font-size:10px; color:rgba(255,255,255,0.28); margin-top:5px; }
+  .ach-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:12px; }
+  .ach-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:13px; padding:13px 11px; }
+  .ach-card-ico { font-size:18px; margin-bottom:5px; }
+  .ach-card-val { font-size:22px; font-weight:900; color:#fff; line-height:1; }
+  .ach-card-val.tc { color:#00c8ff; } .ach-card-val.gc { color:#00e5a0; } .ach-card-val.oc { color:#ffa340; }
+  .ach-card-lbl { font-size:9px; color:rgba(255,255,255,0.3); margin-top:4px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .ach-ms-title { font-size:9px; font-weight:800; color:rgba(255,255,255,0.2); text-transform:uppercase; letter-spacing:1px; margin:4px 0 9px; }
+  .ach-ms { display:flex; align-items:center; gap:9px; padding:9px 11px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; margin-bottom:5px; }
+  .ach-ms.earned { border-color:rgba(0,229,160,0.22); background:rgba(0,229,160,0.04); }
+  .ach-ms-medal { font-size:17px; width:22px; text-align:center; }
+  .ach-ms-info { flex:1; }
+  .ach-ms-name { font-size:11px; font-weight:700; color:rgba(255,255,255,0.6); }
+  .ach-ms.earned .ach-ms-name { color:#fff; }
+  .ach-ms-desc { font-size:9px; color:rgba(255,255,255,0.28); }
+  .ach-ms-check { font-size:15px; color:#00e5a0; opacity:0; }
+  .ach-ms.earned .ach-ms-check { opacity:1; }
+
   </style>
 </head>
 <body>
@@ -860,6 +935,9 @@
     <button class="nav-btn" id="nb-support" onclick="jumpTo('s-support')">
       <span class="material-icons-round">support_agent</span> Destek &amp; Bildirim
     </button>
+    <button class="nav-btn" id="nb-achievements" onclick="jumpTo('s-achievements')">
+      <span class="material-icons-round">emoji_events</span> Başarılarım
+    </button>
 
     <div class="sidebar-section-title" style="margin-top:8px">Aksiyon</div>
     <button class="nav-btn" onclick="loadDomains()">
@@ -867,6 +945,9 @@
     </button>
     <button class="nav-btn" onclick="testApi()">
       <span class="material-icons-round">bolt</span> API Sağlık Testi
+    </button>
+    <button class="nav-btn" onclick="resetProfile()" style="color:#ff4560">
+      <span class="material-icons-round">person_remove</span> Profili Sıfırla
     </button>
 
     <a href="/" class="back-link">
@@ -912,6 +993,69 @@
               <span class="material-icons-round" style="font-size:14px">signal_cellular_alt</span>
               <span class="material-icons-round" style="font-size:14px">wifi</span>
               <span class="material-icons-round" style="font-size:14px">battery_full</span>
+            </div>
+          </div>
+
+          <!-- ── Push Notification Banner ──────────────────────────── -->
+          <div id="pushNotifBanner">
+            <div class="push-card">
+              <div class="push-app-icon">
+                <span class="material-icons-round">security</span>
+              </div>
+              <div class="push-content">
+                <div class="push-app-name">BAHİS KORUMA</div>
+                <div class="push-body" id="pushBody">Kalkanın aktif! Bugün de güvendesin. 🛡️</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Onboarding Wizard ──────────────────────────────────── -->
+          <div id="onboardingWizard">
+            <div class="ob-logo"><span class="material-icons-round">security</span></div>
+            <div class="ob-title">Kişiselleştirilmiş Profil</div>
+            <div class="ob-sub">Seni daha iyi koruyabilmemiz için<br>birkaç soru soracağız.</div>
+            <div class="ob-steps" id="obStepDots">
+              <div class="ob-step-dot active" id="obDot1"></div>
+              <div class="ob-step-dot" id="obDot2"></div>
+              <div class="ob-step-dot" id="obDot3"></div>
+            </div>
+
+            <!-- Step 1: Age -->
+            <div class="ob-panel active" id="obStep1">
+              <div class="ob-icon-wrap"><span class="material-icons-round">cake</span></div>
+              <div class="ob-q">Kaç yaşındasın?</div>
+              <div class="ob-hint">Yaşınıza özel destek materyalleri hazırlanacak.</div>
+              <input class="ob-input" id="obAge" type="number" min="10" max="100" placeholder="25" inputmode="numeric">
+              <button class="ob-next-btn" onclick="onboardNext(1)">
+                Devam Et <span class="material-icons-round" style="font-size:16px">arrow_forward</span>
+              </button>
+              <div class="ob-privacy">🔒 Verileriniz yalnızca cihazınızda saklanır.</div>
+            </div>
+
+            <!-- Step 2: Years playing -->
+            <div class="ob-panel" id="obStep2">
+              <div class="ob-icon-wrap"><span class="material-icons-round">schedule</span></div>
+              <div class="ob-q">Kaç yıldır oynuyorsun?</div>
+              <div class="ob-hint">İyileşme sürecini kişiselleştirmek için kullanılır.</div>
+              <input class="ob-input" id="obYears" type="number" min="0" max="50" placeholder="3" inputmode="numeric">
+              <button class="ob-next-btn" onclick="onboardNext(2)">
+                Devam Et <span class="material-icons-round" style="font-size:16px">arrow_forward</span>
+              </button>
+            </div>
+
+            <!-- Step 3: Monthly spend -->
+            <div class="ob-panel" id="obStep3">
+              <div class="ob-icon-wrap" style="background:rgba(0,229,160,0.1);border-color:rgba(0,229,160,0.2)">
+                <span class="material-icons-round" style="color:#00e5a0">attach_money</span>
+              </div>
+              <div class="ob-q">Aylık kumar harcaman ne kadar?</div>
+              <div class="ob-hint">Kurtardığın parayı canlı izlemen için gerekli.<br>$ olarak gir (örn: 500)</div>
+              <input class="ob-input" id="obMonthly" type="number" min="0" placeholder="500" inputmode="decimal">
+              <button class="ob-next-btn" onclick="onboardNext(3)" style="background:linear-gradient(135deg,#00b876,#00e5a0);color:#07090f">
+                <span class="material-icons-round" style="font-size:16px">emoji_events</span>
+                Korumayı Başlat!
+              </button>
+              <div class="ob-privacy">🔒 Verileriniz yalnızca cihazınızda saklanır.</div>
             </div>
           </div>
 
@@ -1050,6 +1194,10 @@
                   <span class="material-icons-round">support_agent</span>
                   <span class="lbl">Destek</span>
                 </button>
+                <button class="bnav-item" onclick="navigate('s-achievements',false)">
+                  <span class="material-icons-round">emoji_events</span>
+                  <span class="lbl">Başarı</span>
+                </button>
               </div>
             </div>
 
@@ -1185,6 +1333,10 @@
                   <span class="material-icons-round">support_agent</span>
                   <span class="lbl">Destek</span>
                 </button>
+                <button class="bnav-item" onclick="navigate('s-achievements',false)">
+                  <span class="material-icons-round">emoji_events</span>
+                  <span class="lbl">Başarı</span>
+                </button>
               </div>
             </div>
 
@@ -1267,6 +1419,10 @@
                 <button class="bnav-item" onclick="navigate('s-support',false)">
                   <span class="material-icons-round">support_agent</span>
                   <span class="lbl">Destek</span>
+                </button>
+                <button class="bnav-item" onclick="navigate('s-achievements',false)">
+                  <span class="material-icons-round">emoji_events</span>
+                  <span class="lbl">Başarı</span>
                 </button>
               </div>
             </div>
@@ -1382,6 +1538,118 @@
                 <button class="bnav-item active" onclick="navigate('s-support',false)">
                   <span class="material-icons-round">support_agent</span>
                   <span class="lbl">Destek</span>
+                </button>
+                <button class="bnav-item" onclick="navigate('s-achievements',false)">
+                  <span class="material-icons-round">emoji_events</span>
+                  <span class="lbl">Başarı</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- SCREEN 7: BAŞARILARIM                                   -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div id="s-achievements" class="screen">
+              <div class="ach-header">
+                <div class="ach-header-icon"><span class="material-icons-round">emoji_events</span></div>
+                <div>
+                  <div class="ach-header-title">🏆 Başarılarım</div>
+                  <div class="ach-header-sub" id="achProfileSub">Profilin yükleniyor...</div>
+                </div>
+              </div>
+
+              <div class="ach-scroll">
+                <!-- Hero: Saved Money -->
+                <div class="ach-hero">
+                  <div class="ach-hero-label">💰 Cebinde Kalan</div>
+                  <div class="ach-hero-amount" id="achMoney">$0.00</div>
+                  <div class="ach-hero-sub" id="achMoneyRate">Aylık harcama verisi bekleniyor...</div>
+                </div>
+
+                <!-- 3 stat cards -->
+                <div class="ach-grid">
+                  <div class="ach-card">
+                    <div class="ach-card-ico">🌟</div>
+                    <div class="ach-card-val gc" id="achDays">0</div>
+                    <div class="ach-card-lbl">Temiz Gün</div>
+                  </div>
+                  <div class="ach-card">
+                    <div class="ach-card-ico">⏱️</div>
+                    <div class="ach-card-val tc" id="achTime">0s</div>
+                    <div class="ach-card-lbl">Kurtarılan Zaman</div>
+                  </div>
+                  <div class="ach-card">
+                    <div class="ach-card-ico">🚫</div>
+                    <div class="ach-card-val oc" id="achBlocked">0</div>
+                    <div class="ach-card-lbl">Engellenen Teklif</div>
+                  </div>
+                  <div class="ach-card">
+                    <div class="ach-card-ico">🛡️</div>
+                    <div class="ach-card-val tc" id="achShieldDays">0</div>
+                    <div class="ach-card-lbl">Koruma Günü</div>
+                  </div>
+                </div>
+
+                <!-- Milestones -->
+                <div class="ach-ms-title">🎖️ Rozetler</div>
+                <div id="achMilestones">
+                  <div class="ach-ms" id="ms0">
+                    <div class="ach-ms-medal">🥉</div>
+                    <div class="ach-ms-info">
+                      <div class="ach-ms-name">İlk Adım</div>
+                      <div class="ach-ms-desc">1 gün temiz kal</div>
+                    </div>
+                    <span class="material-icons-round ach-ms-check">check_circle</span>
+                  </div>
+                  <div class="ach-ms" id="ms1">
+                    <div class="ach-ms-medal">🥈</div>
+                    <div class="ach-ms-info">
+                      <div class="ach-ms-name">Demir İrade</div>
+                      <div class="ach-ms-desc">7 gün temiz kal</div>
+                    </div>
+                    <span class="material-icons-round ach-ms-check">check_circle</span>
+                  </div>
+                  <div class="ach-ms" id="ms2">
+                    <div class="ach-ms-medal">🥇</div>
+                    <div class="ach-ms-info">
+                      <div class="ach-ms-name">Ay Şampiyonu</div>
+                      <div class="ach-ms-desc">30 gün temiz kal</div>
+                    </div>
+                    <span class="material-icons-round ach-ms-check">check_circle</span>
+                  </div>
+                  <div class="ach-ms" id="ms3">
+                    <div class="ach-ms-medal">💎</div>
+                    <div class="ach-ms-info">
+                      <div class="ach-ms-name">Elmas Kalkan</div>
+                      <div class="ach-ms-desc">$1000 kurtardın</div>
+                    </div>
+                    <span class="material-icons-round ach-ms-check">check_circle</span>
+                  </div>
+                </div>
+
+                <div style="height:16px"></div>
+              </div>
+
+              <div class="bottom-nav">
+                <button class="bnav-item" onclick="navigate('s-dashboard',true)">
+                  <span class="material-icons-round">security</span>
+                  <span class="lbl">VPN</span>
+                </button>
+                <button class="bnav-item" onclick="navigate('s-setup',false)">
+                  <span class="material-icons-round">build_circle</span>
+                  <span class="lbl">Kurulum</span>
+                </button>
+                <button class="bnav-item" onclick="navigate('s-buddy',false)">
+                  <span class="material-icons-round">sos</span>
+                  <span class="lbl">SOS</span>
+                </button>
+                <button class="bnav-item" onclick="navigate('s-support',false)">
+                  <span class="material-icons-round">support_agent</span>
+                  <span class="lbl">Destek</span>
+                </button>
+                <button class="bnav-item active" onclick="navigate('s-achievements',false)">
+                  <span class="material-icons-round">emoji_events</span>
+                  <span class="lbl">Başarı</span>
                 </button>
               </div>
             </div>
@@ -1564,10 +1832,13 @@
 
     const names = {
       's-splash':'Splash','s-login':'Login','s-dashboard':'Dashboard',
-      's-setup':'Kalkan Kurulumu','s-buddy':'Buddy SOS','s-support':'Destek & Bildirim'
+      's-setup':'Kalkan Kurulumu','s-buddy':'Buddy SOS','s-support':'Destek & Bildirim',
+      's-achievements':'Başarılarım'
     };
     document.getElementById('infoScreen').textContent = names[nextId] || nextId;
     addLog(`Ekran: ${names[nextId] || nextId}`);
+
+    if (nextId === 's-achievements') updateAchievements();
 
     // sync sidebar
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -1591,7 +1862,8 @@
 
     const names = {
       's-splash':'Splash','s-login':'Login','s-dashboard':'Dashboard',
-      's-setup':'Kalkan Kurulumu','s-buddy':'Buddy SOS','s-support':'Destek & Bildirim'
+      's-setup':'Kalkan Kurulumu','s-buddy':'Buddy SOS','s-support':'Destek & Bildirim',
+      's-achievements':'Başarılarım'
     };
     document.getElementById('infoScreen').textContent = names[id] || id;
 
@@ -1744,6 +2016,145 @@
     }
   }
 
+  // ── Onboarding ─────────────────────────────────────────────────────────────
+  function initOnboarding() {
+    const profile = JSON.parse(localStorage.getItem('bahiskoruma_profile') || 'null');
+    if (!profile) {
+      document.getElementById('onboardingWizard').classList.add('active');
+    } else {
+      postOnboarding();
+    }
+  }
+
+  function onboardNext(step) {
+    if (step === 1) {
+      const v = parseFloat(document.getElementById('obAge').value);
+      if (!v || v < 10 || v > 110) return shakeInput('obAge');
+    } else if (step === 2) {
+      const v = parseFloat(document.getElementById('obYears').value);
+      if (v === '' || v < 0 || isNaN(v)) return shakeInput('obYears');
+    } else if (step === 3) {
+      const v = parseFloat(document.getElementById('obMonthly').value);
+      if (!v || v < 0 || isNaN(v)) return shakeInput('obMonthly');
+      return completeOnboarding();
+    }
+    document.getElementById(`obStep${step}`).classList.remove('active');
+    document.getElementById(`obStep${step + 1}`).classList.add('active');
+    document.getElementById(`obDot${step}`).classList.remove('active');
+    document.getElementById(`obDot${step}`).classList.add('done');
+    document.getElementById(`obDot${step + 1}`).classList.add('active');
+    document.getElementById(`obStep${step + 1}`).querySelector('.ob-input')?.focus();
+  }
+
+  function shakeInput(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('shake');
+    el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+    el.focus();
+  }
+
+  function completeOnboarding() {
+    const age     = parseInt(document.getElementById('obAge').value)     || 25;
+    const years   = parseInt(document.getElementById('obYears').value)   || 2;
+    const monthly = parseFloat(document.getElementById('obMonthly').value) || 300;
+    const profile = {
+      age, yearsPlaying: years, monthlySpend: monthly,
+      joinedAt: Date.now() - 7 * 24 * 60 * 60 * 1000,
+    };
+    localStorage.setItem('bahiskoruma_profile', JSON.stringify(profile));
+    const wiz = document.getElementById('onboardingWizard');
+    wiz.classList.add('fade-out');
+    setTimeout(() => { wiz.classList.remove('active', 'fade-out'); postOnboarding(); }, 450);
+    addLog(`👤 Profil oluşturuldu — yaş:${age} yıl:${years} aylık:$${monthly}`, 'ok');
+  }
+
+  function postOnboarding() {
+    updateAchievements();
+    startAchievementsCounter();
+    startMotivationClock();
+  }
+
+  function resetProfile() {
+    localStorage.removeItem('bahiskoruma_profile');
+    location.reload();
+  }
+
+  // ── Achievements Counter ────────────────────────────────────────────────────
+  let achTimer = null;
+
+  function startAchievementsCounter() {
+    if (achTimer) return;
+    achTimer = setInterval(updateAchievements, 1000);
+  }
+
+  function updateAchievements() {
+    const profile = JSON.parse(localStorage.getItem('bahiskoruma_profile') || 'null');
+    if (!profile) return;
+
+    const elapsedMs   = Date.now() - profile.joinedAt;
+    const elapsedDays = elapsedMs / (1000 * 60 * 60 * 24);
+    const cleanDays   = Math.floor(elapsedDays);
+
+    const dailyRate   = (profile.monthlySpend || 0) / 30;
+    const savedMoney  = dailyRate * elapsedDays;
+
+    const savedHoursTotal = elapsedDays * 4;
+    const timeStr = savedHoursTotal < 24
+      ? `${savedHoursTotal.toFixed(1)}s`
+      : `${Math.floor(savedHoursTotal / 24)}g ${(savedHoursTotal % 24).toFixed(0)}s`;
+
+    const blockedOffers = Math.floor(elapsedDays * 8.4);
+
+    window._simStats = { savedMoney: savedMoney.toFixed(2), cleanDays };
+
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    set('achMoney',      '$' + savedMoney.toFixed(2));
+    set('achDays',       cleanDays);
+    set('achTime',       timeStr);
+    set('achBlocked',    blockedOffers);
+    set('achShieldDays', cleanDays);
+    set('achMoneyRate',  `$${dailyRate.toFixed(2)}/gün oranıyla`);
+    set('achProfileSub', `Yaş: ${profile.age} · ${profile.yearsPlaying} yıl · $${profile.monthlySpend}/ay`);
+
+    const milestones = [
+      { id: 'ms0', check: cleanDays >= 1 },
+      { id: 'ms1', check: cleanDays >= 7 },
+      { id: 'ms2', check: cleanDays >= 30 },
+      { id: 'ms3', check: savedMoney >= 1000 },
+    ];
+    milestones.forEach(m => {
+      const el = document.getElementById(m.id);
+      if (el) el.classList.toggle('earned', m.check);
+    });
+  }
+
+  // ── Push Notifications ─────────────────────────────────────────────────────
+  function showPushNotification(msg) {
+    const banner = document.getElementById('pushNotifBanner');
+    const body   = document.getElementById('pushBody');
+    if (!banner || !body) return;
+    body.textContent = msg;
+    banner.classList.add('show');
+    setTimeout(() => banner.classList.remove('show'), 4500);
+  }
+
+  let _motivIdx = 0;
+  function startMotivationClock() {
+    const msgs = [
+      () => { const s = window._simStats || {}; return `🌟 Harika gidiyorsun! ${s.cleanDays || 0} gündür temizsin ve $${parseFloat(s.savedMoney || 0).toFixed(0)} kurtardın!`; },
+      () => `🛡️ Kalkanın aktif — bugün de güvendesin. Gurur duy!`,
+      () => { const s = window._simStats || {}; return `💪 ${s.cleanDays || 0} temiz gün! Bu başarı senindir, sahip çık.`; },
+      () => `💙 Zorlu anlar geçiyor. Sen her zorluğun üstesinden geldin.`,
+      () => { const s = window._simStats || {}; return `💰 $${parseFloat(s.savedMoney || 0).toFixed(2)} kurtardın! Bunu hayal et — ne yapardın?`; },
+      () => `🔒 Bahis Koruma seninle. Her korunan gün yeni bir kazanım.`,
+    ];
+    setTimeout(() => {
+      showPushNotification(msgs[_motivIdx++ % msgs.length]());
+      setInterval(() => showPushNotification(msgs[_motivIdx++ % msgs.length]()), 35000);
+    }, 12000);
+  }
+
   // ── Heartbeat ──────────────────────────────────────────────────────────────
   let heartbeatTimer  = null;
   let heartbeatActive = false;
@@ -1776,7 +2187,9 @@
           userId:       'SIM-Kullanici-001',
           device:       'iPhone 15 Pro (Simülatör)',
           location:     'İstanbul, TR',
-          shieldActive: simShieldActive
+          shieldActive: simShieldActive,
+          savedMoney:   parseFloat(window._simStats?.savedMoney || 0),
+          cleanDays:    parseInt(window._simStats?.cleanDays || 0),
         })
       });
       setHbStatus(true);
@@ -1830,7 +2243,7 @@
   // ── i18n Dictionary ────────────────────────────────────────────────────────
   const I18N = {
     tr: {
-      nav: ['VPN','Kurulum','SOS','Destek'],
+      nav: ['VPN','Kurulum','SOS','Destek','Başarı'],
       faqSection: '❓ Sık Sorulan Sorular',
       ticketSection: '📩 Destek Talebi Oluştur',
       faqQ: ['🛡️ Sabotaj koruması nedir?','🔒 Kalkan nasıl çalışır?','💙 Kumar isteği geldiğinde ne yapmalıyım?'],
@@ -1845,7 +2258,7 @@
       connErr: 'Bağlantı hatası. Lütfen tekrar dene.',
     },
     en: {
-      nav: ['VPN','Setup','SOS','Support'],
+      nav: ['VPN','Setup','SOS','Support','Awards'],
       faqSection: '❓ Frequently Asked Questions',
       ticketSection: '📩 Create Support Ticket',
       faqQ: ['🛡️ What is sabotage protection?','🔒 How does the Shield work?','💙 What should I do when I feel a gambling urge?'],
@@ -1860,7 +2273,7 @@
       connErr: 'Connection error. Please try again.',
     },
     zh: {
-      nav: ['VPN','安装','SOS','支持'],
+      nav: ['VPN','安装','SOS','支持','成就'],
       faqSection: '❓ 常见问题',
       ticketSection: '📩 提交支持请求',
       faqQ: ['🛡️ 什么是防破坏保护？','🔒 保护盾如何工作？','💙 出现赌博冲动时该怎么办？'],
@@ -1875,7 +2288,7 @@
       connErr: '连接错误，请重试。',
     },
     ar: {
-      nav: ['VPN','الإعداد','SOS','الدعم'],
+      nav: ['VPN','الإعداد','SOS','الدعم','إنجازات'],
       faqSection: '❓ الأسئلة الشائعة',
       ticketSection: '📩 إنشاء طلب دعم',
       faqQ: ['🛡️ ما هي حماية التخريب؟','🔒 كيف يعمل الدرع الواقي؟','💙 ماذا أفعل عند الشعور بالرغبة في القمار؟'],
@@ -1890,7 +2303,7 @@
       connErr: 'خطأ في الاتصال. يرجى المحاولة مجدداً.',
     },
     es: {
-      nav: ['VPN','Config.','SOS','Soporte'],
+      nav: ['VPN','Config.','SOS','Soporte','Logros'],
       faqSection: '❓ Preguntas Frecuentes',
       ticketSection: '📩 Crear Solicitud de Soporte',
       faqQ: ['🛡️ ¿Qué es la protección anti-sabotaje?','🔒 ¿Cómo funciona el Escudo?','💙 ¿Qué hago cuando siento el impulso de apostar?'],
@@ -1992,6 +2405,8 @@
           sessionId: chatSessionId,
           message:   msg,
           lang:      currentLang,
+          savedMoney: parseFloat(window._simStats?.savedMoney || 0),
+          cleanDays:  parseInt(window._simStats?.cleanDays || 0),
         }),
       });
       const d = await r.json();
@@ -2192,6 +2607,7 @@
     }
 
     startHeartbeat();
+    initOnboarding();
     addLog('Simülatör hazır — Anti-tamper aktif', 'ok');
   })();
 </script>

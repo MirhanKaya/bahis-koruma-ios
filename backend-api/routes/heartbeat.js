@@ -5,13 +5,15 @@ const { recordUser, getActiveUsers } = require('../services/userTracker');
 
 router.post('/', (req, res) => {
   recordHeartbeat();
-  const { userId, device, location, shieldActive } = req.body || {};
+  const { userId, device, location, shieldActive, savedMoney, cleanDays } = req.body || {};
   recordUser({
     userId:      userId || 'unknown',
     device:      device || 'Bilinmiyor',
     location:    location || 'Bilinmiyor',
     shieldActive: shieldActive !== false,
-    ip:          req.headers['x-forwarded-for'] || req.socket.remoteAddress || '—'
+    ip:          req.headers['x-forwarded-for'] || req.socket.remoteAddress || '—',
+    savedMoney:  savedMoney != null ? savedMoney : undefined,
+    cleanDays:   cleanDays  != null ? cleanDays  : undefined,
   });
   res.json({ success: true, timestamp: new Date().toISOString() });
 });
