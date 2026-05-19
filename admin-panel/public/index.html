@@ -1458,7 +1458,12 @@
         container.innerHTML = '<div class="empty" style="padding:28px 0;text-align:center;color:var(--muted)">Henüz AI sohbeti yok</div>';
         return;
       }
-      container.innerHTML = d.chats.map(c => `
+      const LANG_LABELS = { tr:'🇹🇷 TR', en:'🇬🇧 EN', zh:'🇨🇳 ZH', ar:'🇸🇦 AR', es:'🇪🇸 ES' };
+      container.innerHTML = d.chats.map(c => {
+        const langCode = (c.lang || 'tr').toLowerCase();
+        const langLabel = LANG_LABELS[langCode] || langCode.toUpperCase();
+        const langColor = { tr:'#00c8ff', en:'#00e5a0', zh:'#ffa340', ar:'#ff4560', es:'#a855f7' }[langCode] || '#888';
+        return `
         <div class="chat-history-entry">
           <div class="chat-history-header">
             <span class="ai-live-dot"></span>
@@ -1466,13 +1471,15 @@
             <span style="font-size:10px;color:var(--muted);background:rgba(0,200,255,0.08);padding:2px 8px;border-radius:10px;border:1px solid rgba(0,200,255,0.15)">
               ${escHtml(c.sessionId)}
             </span>
+            <span style="font-size:10px;font-weight:800;color:${langColor};background:${langColor}18;padding:2px 8px;border-radius:8px;border:1px solid ${langColor}33;letter-spacing:0.4px">${langLabel}</span>
             <span class="chat-history-time">${c.date} ${c.time}</span>
           </div>
           <div class="chat-history-body">
-            <div class="chat-bubble-admin user">${escHtml(c.userMsg)}</div>
-            <div class="chat-bubble-admin bot">${escHtml(c.botReply).replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
+            <div class="chat-bubble-admin user" dir="auto">${escHtml(c.userMsg)}</div>
+            <div class="chat-bubble-admin bot" dir="auto">${escHtml(c.botReply).replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
           </div>
-        </div>`).join('');
+        </div>`;
+      }).join('');
     } catch (e) {
       container.innerHTML = `<div class="empty" style="color:var(--red);padding:20px;text-align:center">Yükleme hatası: ${e.message}</div>`;
     }

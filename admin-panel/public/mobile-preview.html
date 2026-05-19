@@ -648,6 +648,36 @@
     .sos-popup-msg { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.65; }
     .sos-popup-sent { font-size: 15px; font-weight: 700; color: #2a9d8f; margin-top: 14px; display: none; }
 
+    /* ── Language Selector ───────────────────────────────────────────── */
+    .lang-select-wrap {
+      position: relative; display: flex; align-items: center; gap: 8px;
+    }
+    .lang-select {
+      appearance: none; -webkit-appearance: none;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      color: rgba(255,255,255,0.8);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 600;
+      padding: 6px 28px 6px 10px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.18s, background 0.18s;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+    }
+    .lang-select:hover  { border-color: rgba(42,157,143,0.5); background-color: rgba(42,157,143,0.08); }
+    .lang-select:focus  { border-color: #2a9d8f; }
+    .lang-select option { background: #1a1a2e; color: #fff; }
+    .lang-badge {
+      font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+      color: #2a9d8f; background: rgba(42,157,143,0.12);
+      border: 1px solid rgba(42,157,143,0.25);
+      border-radius: 6px; padding: 2px 7px;
+    }
+
     /* ── Chat UI (mobile) ────────────────────────────────────────────── */
     .chat-section-title {
       font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.28);
@@ -852,9 +882,21 @@
         <div style="font-size:16px;font-weight:700;color:#fff">Mobil Uygulama Simülatörü</div>
         <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:2px">Backend API (Port 8000) ile canlı bağlantı</div>
       </div>
-      <div class="api-pill">
-        <div class="dot" id="apiDot"></div>
-        <span id="apiLabel">Kontrol ediliyor...</span>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="lang-select-wrap">
+          <span class="lang-badge" id="langBadge">TR</span>
+          <select class="lang-select" id="langSelect" onchange="applyLang(this.value)">
+            <option value="tr">🇹🇷 TR — Türkçe</option>
+            <option value="en">🇬🇧 EN — English</option>
+            <option value="zh">🇨🇳 ZH — 中文</option>
+            <option value="ar">🇸🇦 AR — العربية</option>
+            <option value="es">🇪🇸 ES — Español</option>
+          </select>
+        </div>
+        <div class="api-pill">
+          <div class="dot" id="apiDot"></div>
+          <span id="apiLabel">Kontrol ediliyor...</span>
+        </div>
       </div>
     </div>
 
@@ -1243,14 +1285,14 @@
               <div class="support-scroll">
                 <!-- ── AI Chat ────────────────────────────────────────── -->
                 <div class="gap-sm"></div>
-                <div class="chat-section-title">
+                <div class="chat-section-title" id="aiSectionTitle">
                   <span class="ai-dot"></span>
                   💬 AI Koruma Asistanı — Canlı
                 </div>
                 <div class="chat-bubbles" id="chatBubbles">
-                  <div class="chat-bubble bot">
+                  <div class="chat-bubble bot" id="greetingBubble">
                     Merhaba! 👋 Ben <strong>Bahis Koruma AI Asistanı</strong>.<br>
-                    VPN sorunun mu var, kalkan hakkında bilgi mi istiyorsun, yoksa sadece konuşmak mı istiyorsun? Her zaman buradayım. 🛡️
+                    VPN sorunun mu var, kalkan hakkında bilgi mi istiyorsun? Buradayım. 🛡️
                   </div>
                 </div>
                 <div class="chat-input-row">
@@ -1265,32 +1307,32 @@
                 <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 0 14px"></div>
 
                 <!-- ── SSS / FAQ ──────────────────────────────────────── -->
-                <div class="chat-section-title">❓ Sık Sorulan Sorular</div>
+                <div class="chat-section-title" id="faqSectionTitle">❓ Sık Sorulan Sorular</div>
                 <div class="faq-list">
                   <div class="faq-item" id="faq0">
                     <button class="faq-q" onclick="toggleFaq(0)">
-                      🛡️ Sabotaj koruması nedir?
+                      <span id="faqQ0">🛡️ Sabotaj koruması nedir?</span>
                       <span class="material-icons-round">expand_more</span>
                     </button>
-                    <div class="faq-a">
+                    <div class="faq-a" id="faqA0">
                       Uygulamayı silmeye veya VPN profilini kaldırmaya çalışırsan sistem otomatik alarm verir. Güvenilir yakının (Buddy) anlık bildirim alır ve admin panelinde uyarı oluşur. Bu özellik, zor anlarda seni senin iyiliğin için korur.
                     </div>
                   </div>
                   <div class="faq-item" id="faq1">
                     <button class="faq-q" onclick="toggleFaq(1)">
-                      🔒 Kalkan nasıl çalışır?
+                      <span id="faqQ1">🔒 Kalkan nasıl çalışır?</span>
                       <span class="material-icons-round">expand_more</span>
                     </button>
-                    <div class="faq-a">
+                    <div class="faq-a" id="faqA1">
                       3 katmanlı sistem: (1) DNS Filtresi kumar sitelerini engeller, (2) VPN Tüneli tüm trafiği güvenli sunucudan geçirir, (3) Gerçek zamanlı liste güncellemesi yeni açılan bahis sitelerini otomatik ekler. Sonuç: %99.7 engelleme başarısı.
                     </div>
                   </div>
                   <div class="faq-item" id="faq2">
                     <button class="faq-q" onclick="toggleFaq(2)">
-                      💙 Kumar isteği geldiğinde ne yapmalıyım?
+                      <span id="faqQ2">💙 Kumar isteği geldiğinde ne yapmalıyım?</span>
                       <span class="material-icons-round">expand_more</span>
                     </button>
-                    <div class="faq-a">
+                    <div class="faq-a" id="faqA2">
                       Hemen "SOS Gönder" butonuna bas — yakının uyarılır. Ya da bu sohbet kutusuna yaz, AI asistan seninle konuşur. İsteği geçirmek için 15 dakika bekle: istatistiksel olarak yoğunluk kendiliğinden düşer. Sen daha güçlüsün.
                     </div>
                   </div>
@@ -1300,7 +1342,7 @@
                 <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 0 14px"></div>
 
                 <!-- ── Ticket Form ─────────────────────────────────────── -->
-                <div class="chat-section-title">📩 Destek Talebi Oluştur</div>
+                <div class="chat-section-title" id="ticketSectionTitle">📩 Destek Talebi Oluştur</div>
                 <div class="type-seg" id="typeSeg">
                   <button id="btnComplaint"  class="sel-complaint"  onclick="selectType('complaint')">⚠️ Şikayet</button>
                   <button id="btnSuggestion"                         onclick="selectType('suggestion')">💡 Öneri</button>
@@ -1785,6 +1827,137 @@
   }
 
   // ── AI Chat ────────────────────────────────────────────────────────────────
+  // ── i18n Dictionary ────────────────────────────────────────────────────────
+  const I18N = {
+    tr: {
+      nav: ['VPN','Kurulum','SOS','Destek'],
+      faqSection: '❓ Sık Sorulan Sorular',
+      ticketSection: '📩 Destek Talebi Oluştur',
+      faqQ: ['🛡️ Sabotaj koruması nedir?','🔒 Kalkan nasıl çalışır?','💙 Kumar isteği geldiğinde ne yapmalıyım?'],
+      faqA: [
+        'Uygulamayı silmeye veya VPN profilini kaldırmaya çalışırsan sistem otomatik alarm verir. Güvenilir yakının (Buddy) anlık bildirim alır ve admin panelinde uyarı oluşur. Bu özellik, zor anlarda seni senin iyiliğin için korur.',
+        '3 katmanlı sistem: (1) DNS Filtresi kumar sitelerini engeller, (2) VPN Tüneli tüm trafiği güvenli sunucudan geçirir, (3) Gerçek zamanlı liste güncellemesi yeni açılan bahis sitelerini otomatik ekler. Sonuç: %99.7 engelleme başarısı.',
+        'Hemen "SOS Gönder" butonuna bas — yakının uyarılır. Ya da bu sohbet kutusuna yaz, AI asistan seninle konuşur. İsteği geçirmek için 15 dakika bekle: istatistiksel olarak yoğunluk kendiliğinden düşer. Sen daha güçlüsün.',
+      ],
+      complaint: '⚠️ Şikayet', suggestion: '💡 Öneri',
+      chatPlaceholder: 'Mesajınızı yazın...',
+      greeting: 'Merhaba! 👋 Ben Bahis Koruma AI Asistanı.\nVPN sorunun mu var, kalkan hakkında bilgi mi istiyorsun? Buradayım. 🛡️',
+      connErr: 'Bağlantı hatası. Lütfen tekrar dene.',
+    },
+    en: {
+      nav: ['VPN','Setup','SOS','Support'],
+      faqSection: '❓ Frequently Asked Questions',
+      ticketSection: '📩 Create Support Ticket',
+      faqQ: ['🛡️ What is sabotage protection?','🔒 How does the Shield work?','💙 What should I do when I feel a gambling urge?'],
+      faqA: [
+        'If you try to delete the app or remove the VPN profile, the system triggers an automatic alarm. Your trusted contact (Buddy) receives an instant notification and an alert is created in the admin panel.',
+        '3-layer system: (1) DNS Filter blocks gambling sites, (2) VPN Tunnel routes all traffic through our secure server, (3) Real-time list updates automatically add new betting sites. Result: 99.7% blocking success.',
+        'Immediately press the "Send SOS" button — your contact will be alerted. Or type here, the AI assistant will talk with you. Wait 15 minutes to let the urge pass: statistically, intensity decreases on its own. You are stronger.',
+      ],
+      complaint: '⚠️ Complaint', suggestion: '💡 Suggestion',
+      chatPlaceholder: 'Type your message...',
+      greeting: 'Hello! 👋 I\'m the Bahis Koruma AI Assistant.\nVPN issue? Questions about the Shield? I\'m always here. 🛡️',
+      connErr: 'Connection error. Please try again.',
+    },
+    zh: {
+      nav: ['VPN','安装','SOS','支持'],
+      faqSection: '❓ 常见问题',
+      ticketSection: '📩 提交支持请求',
+      faqQ: ['🛡️ 什么是防破坏保护？','🔒 保护盾如何工作？','💙 出现赌博冲动时该怎么办？'],
+      faqA: [
+        '如果您尝试删除应用或移除VPN配置文件，系统将自动触发警报。您的可信联系人(Buddy)会立即收到通知，管理面板也会生成警报。此功能在困难时刻保护您。',
+        '三层系统：(1) DNS过滤器屏蔽赌博网站，(2) VPN隧道将所有流量通过我们的安全服务器，(3) 实时列表更新自动添加新赌博网站。结果：99.7%的屏蔽成功率。',
+        '立即按下"紧急SOS"按钮——您的联系人将收到警报。或者在此处输入，AI助手将与您交谈。等待15分钟让冲动平息：统计上，强度会自然降低。您更强大。',
+      ],
+      complaint: '⚠️ 投诉', suggestion: '💡 建议',
+      chatPlaceholder: '输入您的消息...',
+      greeting: '你好！👋 我是博彩保护AI助手。\n有VPN问题？想了解保护盾？我随时都在这里。🛡️',
+      connErr: '连接错误，请重试。',
+    },
+    ar: {
+      nav: ['VPN','الإعداد','SOS','الدعم'],
+      faqSection: '❓ الأسئلة الشائعة',
+      ticketSection: '📩 إنشاء طلب دعم',
+      faqQ: ['🛡️ ما هي حماية التخريب؟','🔒 كيف يعمل الدرع الواقي؟','💙 ماذا أفعل عند الشعور بالرغبة في القمار؟'],
+      faqA: [
+        'إذا حاولت حذف التطبيق أو إزالة ملف تعريف VPN، سيُفعَّل نظام الإنذار تلقائياً. يتلقى شخصك الموثوق (Buddy) إشعاراً فورياً وتُنشأ تنبيهات في لوحة الإدارة. هذه الميزة تحميك في اللحظات الصعبة.',
+        'نظام ثلاثي الطبقات: (١) فلتر DNS يحجب مواقع القمار، (٢) نفق VPN يُوجّه كل حركة البيانات عبر خادمنا الآمن، (٣) تحديثات فورية تُضيف المواقع الجديدة. النتيجة: معدل حجب 99.7٪.',
+        'اضغط فوراً على زر "أرسل SOS" — سيُنبَّه شخصك. أو اكتب هنا، سيتحدث معك المساعد الذكي. انتظر 15 دقيقة لتمر الرغبة: إحصائياً تخفت الحدة من تلقاء نفسها. أنت أقوى.',
+      ],
+      complaint: '⚠️ شكوى', suggestion: '💡 اقتراح',
+      chatPlaceholder: 'اكتب رسالتك...',
+      greeting: 'مرحباً! 👋 أنا مساعد Bahis Koruma بالذكاء الاصطناعي.\nهل لديك مشكلة في VPN؟ هل تريد معرفة المزيد؟ أنا هنا دائماً. 🛡️',
+      connErr: 'خطأ في الاتصال. يرجى المحاولة مجدداً.',
+    },
+    es: {
+      nav: ['VPN','Config.','SOS','Soporte'],
+      faqSection: '❓ Preguntas Frecuentes',
+      ticketSection: '📩 Crear Solicitud de Soporte',
+      faqQ: ['🛡️ ¿Qué es la protección anti-sabotaje?','🔒 ¿Cómo funciona el Escudo?','💙 ¿Qué hago cuando siento el impulso de apostar?'],
+      faqA: [
+        'Si intentas eliminar la app o el perfil VPN, el sistema activa una alarma automática. Tu contacto de confianza (Buddy) recibe una notificación inmediata y se genera una alerta en el panel admin. Esta función te protege en momentos difíciles.',
+        'Sistema de 3 capas: (1) Filtro DNS bloquea sitios de apuestas, (2) Túnel VPN enruta todo el tráfico por nuestro servidor seguro, (3) Actualizaciones en tiempo real añaden nuevos sitios automáticamente. Resultado: 99.7% de éxito de bloqueo.',
+        'Presiona inmediatamente el botón "Enviar SOS" — tu contacto será alertado. O escribe aquí, el asistente IA hablará contigo. Espera 15 minutos para que el impulso pase: estadísticamente, la intensidad disminuye sola. Eres más fuerte.',
+      ],
+      complaint: '⚠️ Queja', suggestion: '💡 Sugerencia',
+      chatPlaceholder: 'Escribe tu mensaje...',
+      greeting: '¡Hola! 👋 Soy el Asistente IA de Bahis Koruma.\n¿Problema con la VPN? ¿Preguntas sobre el Escudo? Siempre estoy aquí. 🛡️',
+      connErr: 'Error de conexión. Por favor, inténtalo de nuevo.',
+    },
+  };
+
+  let currentLang = 'tr';
+
+  function applyLang(code) {
+    if (!I18N[code]) return;
+    currentLang = code;
+    const t = I18N[code];
+
+    document.getElementById('langBadge').textContent = code.toUpperCase();
+    document.getElementById('langSelect').value = code;
+
+    const dir = code === 'ar' ? 'rtl' : 'ltr';
+    document.querySelectorAll('.phone-shell, .screen').forEach(el => el.setAttribute('dir', dir));
+
+    const lbls = document.querySelectorAll('.bnav-item .lbl');
+    lbls.forEach((lbl, i) => { lbl.textContent = t.nav[i % 4]; });
+
+    const faqSec = document.getElementById('faqSectionTitle');
+    if (faqSec) faqSec.textContent = t.faqSection;
+
+    const tkSec = document.getElementById('ticketSectionTitle');
+    if (tkSec) tkSec.textContent = t.ticketSection;
+
+    for (let i = 0; i < 3; i++) {
+      const q = document.getElementById(`faqQ${i}`);
+      const a = document.getElementById(`faqA${i}`);
+      if (q) q.textContent = t.faqQ[i];
+      if (a) a.textContent = t.faqA[i];
+    }
+
+    const bc = document.getElementById('btnComplaint');
+    const bs = document.getElementById('btnSuggestion');
+    if (bc) bc.textContent = t.complaint;
+    if (bs) bs.textContent = t.suggestion;
+
+    const ci = document.getElementById('chatInput');
+    if (ci) ci.placeholder = t.chatPlaceholder;
+
+    const gb = document.getElementById('greetingBubble');
+    if (gb) gb.innerHTML = t.greeting.replace(/\n/g,'<br>');
+
+    const ais = document.getElementById('aiSectionTitle');
+    if (ais) {
+      const aiDot = ais.querySelector('.ai-dot');
+      ais.innerHTML = '';
+      if (aiDot) ais.appendChild(aiDot);
+      ais.appendChild(document.createTextNode(' 💬 ' + (
+        { tr:'AI Koruma Asistanı — Canlı', en:'AI Protection Assistant — Live',
+          zh:'AI保护助手 — 在线', ar:'مساعد الحماية AI', es:'Asistente IA — En Vivo' }[code] || 'AI Asistanı'
+      )));
+    }
+  }
+
   let chatSessionId = `session_sim_${Date.now()}`;
 
   function addBubble(text, role) {
@@ -1818,6 +1991,7 @@
           userId:    `sim_${chatSessionId}`,
           sessionId: chatSessionId,
           message:   msg,
+          lang:      currentLang,
         }),
       });
       const d = await r.json();
