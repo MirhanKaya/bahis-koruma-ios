@@ -1365,7 +1365,8 @@
     btn.disabled  = true;
 
     setTimeout(() => {
-      vpnRunning   = true;
+      vpnRunning      = true;
+      simShieldActive = true;
       btn.disabled = false;
       ring.className   = 'shield-ring on';
       status.className = 'vpn-status on';
@@ -1393,7 +1394,9 @@
     const cardSt = document.getElementById('cardVpnState');
     const infoVpn= document.getElementById('infoVpn');
 
-    vpnRunning = false;
+    vpnRunning      = false;
+    simShieldActive = false;
+    sendHeartbeat();
     ring.className   = 'shield-ring off';
     status.className = 'vpn-status off';
     status.textContent = 'VPN Kapalı — Koruma devre dışı';
@@ -1425,6 +1428,7 @@
   let heartbeatTimer  = null;
   let heartbeatActive = false;
   let appInstalled    = true;
+  let simShieldActive = true;
 
   function startHeartbeat() {
     if (heartbeatTimer) return;
@@ -1448,7 +1452,12 @@
       await fetch('/api/heartbeat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ deviceId: 'sim-001' })
+        body: JSON.stringify({
+          userId:       'SIM-Kullanici-001',
+          device:       'iPhone 15 Pro (Simülatör)',
+          location:     'İstanbul, TR',
+          shieldActive: simShieldActive
+        })
       });
       setHbStatus(true);
     } catch {}
