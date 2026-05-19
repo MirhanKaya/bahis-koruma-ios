@@ -446,6 +446,53 @@
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+    /* ── Role Selector ───────────────────────────────────────────────────── */
+    .sb-role-wrap {
+      padding: 10px 14px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sb-role-label {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.1px; color: var(--muted); display: block; margin-bottom: 7px;
+    }
+    .sb-role-select {
+      width: 100%;
+      background: rgba(0,200,255,0.06);
+      border: 1px solid rgba(0,200,255,0.18);
+      border-radius: 8px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 600;
+      padding: 8px 28px 8px 10px;
+      cursor: pointer; outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(0%2C200%2C255%2C0.45)'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+    .sb-role-select:hover, .sb-role-select:focus {
+      border-color: rgba(0,200,255,0.4);
+      background-color: rgba(0,200,255,0.1);
+    }
+    .sb-role-select option { background: #0d1021; }
+    .sb-role-badge {
+      margin-top: 7px; font-size: 10px; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px;
+      display: inline-block; letter-spacing: 0.3px;
+      border: 1px solid transparent;
+    }
+    .rb-super   { background: rgba(255,163,64,0.12); color: var(--orange); border-color: rgba(255,163,64,0.28); }
+    .rb-tech    { background: rgba(0,200,255,0.10);  color: var(--accent); border-color: rgba(0,200,255,0.25); }
+    .rb-support { background: rgba(0,229,160,0.10);  color: var(--green);  border-color: rgba(0,229,160,0.25); }
+    .sb-role-lock {
+      margin-top: 6px; font-size: 10px; color: rgba(255,69,96,0.7);
+      display: none; padding: 4px 8px;
+      background: rgba(255,69,96,0.06); border-radius: 6px;
+      border: 1px solid rgba(255,69,96,0.15);
+    }
+    .sb-role-lock.show { display: block; }
   </style>
 </head>
 <body>
@@ -458,6 +505,18 @@
       <div class="sb-logo-title">Bahis Koruma</div>
       <div class="sb-logo-sub">Komuta Merkezi</div>
     </div>
+  </div>
+
+  <!-- ── Role Simulator ─────────────────────────────────────────────── -->
+  <div class="sb-role-wrap">
+    <span class="sb-role-label">⚙️ Aktif Çalışan Rolü</span>
+    <select class="sb-role-select" id="roleSelect" onchange="setAdminRole(this.value)">
+      <option value="super_admin">👑 Süper Yönetici</option>
+      <option value="technical_support">🛠️ Teknik Destek</option>
+      <option value="customer_support">📞 Müşteri Temsilcisi</option>
+    </select>
+    <span class="sb-role-badge rb-super" id="roleBadge">Tam Yetki</span>
+    <div class="sb-role-lock" id="roleLockMsg"></div>
   </div>
 
   <nav class="sb-nav">
@@ -753,6 +812,74 @@
 
 <script>
   const API = '';
+
+  // ── RBAC: Role Simulator ──────────────────────────────────────────────────
+  window._adminRole = 'super_admin';
+
+  const ROLE_NAV_HIDDEN = {
+    super_admin:       [],
+    technical_support: ['nav-subscriptions', 'nav-finance'],
+    customer_support:  ['nav-domains', 'nav-finance', 'nav-geo'],
+  };
+
+  const ROLE_META = {
+    super_admin:       { badge: 'rb-super',   label: '👑 Tam Yetki',       name: 'Süper Yönetici' },
+    technical_support: { badge: 'rb-tech',    label: '🛠️ Teknik Erişim',  name: 'Teknik Destek' },
+    customer_support:  { badge: 'rb-support', label: '📞 Destek Erişimi',  name: 'Müşteri Temsilcisi' },
+  };
+
+  const ALL_NAV_IDS = ['nav-dashboard','nav-domains','nav-subscriptions','nav-finance','nav-support','nav-geo'];
+
+  function setAdminRole(role) {
+    window._adminRole = role;
+    const hidden  = ROLE_NAV_HIDDEN[role] || [];
+    const meta    = ROLE_META[role] || ROLE_META['super_admin'];
+
+    ALL_NAV_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = hidden.includes(id) ? 'none' : 'flex';
+    });
+
+    const activeNav = document.querySelector('.nav-item.active[id^="nav-"]');
+    if (activeNav && hidden.includes(activeNav.id)) {
+      switchTab('dashboard');
+    }
+
+    const badge = document.getElementById('roleBadge');
+    if (badge) {
+      badge.className = 'sb-role-badge ' + meta.badge;
+      badge.textContent = meta.label;
+    }
+
+    const lockMsg = document.getElementById('roleLockMsg');
+    if (lockMsg) {
+      if (hidden.length > 0) {
+        lockMsg.className = 'sb-role-lock show';
+        lockMsg.textContent = `🔒 ${hidden.length} sekme kısıtlı`;
+      } else {
+        lockMsg.className = 'sb-role-lock';
+      }
+    }
+
+    toast(`Rol: ${meta.name} — yetki uygulandı`, 'info');
+  }
+
+  // Fetch interceptor: inject x-admin-role on sensitive API calls
+  (function() {
+    const _orig = window.fetch;
+    window.fetch = function(url, opts) {
+      opts = opts || {};
+      const u = typeof url === 'string' ? url : (url && url.url ? url.url : '');
+      if (u.startsWith('/api/subscriptions') || u.startsWith('/api/finance')) {
+        opts = Object.assign({}, opts, {
+          headers: Object.assign({}, opts.headers || {}, {
+            'x-admin-role': window._adminRole || 'super_admin'
+          })
+        });
+      }
+      return _orig.call(this, url, opts);
+    };
+  })();
 
   // ════════════════════════════════════════════════════════════
   // FIREBASE CONFIG

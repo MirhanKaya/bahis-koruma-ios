@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 const { requireApiKey } = require('./middleware/auth');
+const { requireRole }   = require('./middleware/rbac');
 const domainsRouter   = require('./routes/domains');
 const classifyRouter  = require('./routes/classify');
 const usersRouter     = require('./routes/users');
@@ -38,8 +39,8 @@ app.use('/classify-domain', requireApiKey, classifyRouter);
 app.use('/api/buddy/alert', requireApiKey, buddyRouter);
 app.use('/api/heartbeat',     heartbeatRouter);
 app.use('/api/geo',           geoRouter);
-app.use('/api/subscriptions', subscriptionsRouter);
-app.use('/api/finance',       financeRouter);
+app.use('/api/subscriptions', requireRole('subscriptions'), subscriptionsRouter);
+app.use('/api/finance',       requireRole('finance'),        financeRouter);
 app.use('/api/tickets',       ticketsRouter);
 app.use('/api/ai-chat',      aiChatRouter);
 
